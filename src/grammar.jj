@@ -1,0 +1,144 @@
+/* Sample grammar file*/
+options {
+   IGNORE_CASE = true;
+ }
+
+PARSER_BEGIN(CCALParser)
+
+public class CCALParser {
+
+    public static void main(String [] args){
+
+          //Parser initialization
+          CCALParser parser;
+
+          if(args.length == 0){
+            System.out.println ("CCALParser: Reading input ...");
+            parser = new CCALParser(System.in);
+          }
+          else if(args.length == 1){
+            System.out.println ("CCALParser: Reading the file " + args[0] + " ..." );
+            try {
+              parser = new CCALParser(new java.io.FileInputStream(args[0]));
+            }
+            catch(java.io.FileNotFoundException e) {
+              System.out.println ("CCALParser: The file " + args[0] + " was not found.");
+              return;
+            }
+          }
+          else {
+            System.out.println ("CCALParser:  You must use one of the following:");
+            System.out.println ("         java CCALParser < file");
+            System.out.println ("Or");
+            System.out.println ("         java CCALParser file");
+            return ;
+          }
+          try {
+            Start();
+            System.out.println ("CCALParser: The input was readed sucessfully.");
+          }
+          catch(ParseException e){
+            System.out.println ("CCALParser: There was an error during the parse.");
+            System.out.println (e.getMessage());
+          }
+          catch(TokenMgrError e){
+            System.out.println ("CCALParser: There was an error.");
+            System.out.println (e.getMessage());
+          }
+        }
+    }
+
+PARSER_END (CCALParser)
+
+TOKEN_MGR_DECLS :
+{
+    static int commentNesting = 0;
+}
+
+SKIP: { "\n" | "\r" | "\r\n" |"\\"|"\t"|" "}
+
+//Comment Skips
+SKIP :
+{
+    "/*" { commentNesting++; } : IN_COMMENT
+    | <"//" (~["\n"])* "\n">
+}
+
+//https://goo.gl/RFkbtP
+<IN_COMMENT> SKIP : {
+   "/*" { commentNesting++;}
+   | "*/" { commentNesting--;
+            if(commentNesting == 0)
+                SwitchTo(DEFAULT);
+            }
+   |<~[]>
+
+}
+
+//STATIC TOKENS
+TOKEN : {
+ <INTEGER_CONSTANT: (<DIGIT>)+>
+|  <LOGIC_CONSTANT: "true" | "false" | "-1">
+|  <STRING_CONSTANT: "\"" ( ~["\"","\\","\n","\r"] | "\\" ( ["n","t","b","r","f","\\","\'","\""] | ( ["\n","\r"] | "\r\n")))* "\"">
+}
+
+//Static Tokens
+TOKEN :
+{
+    <OBRA :("(")>
+  | <CBRA:(")")>
+  | <AND:("&&")>
+  | <OR:("||")>
+  | <EQ:("==")>
+  | <NOTEQ:("!=")>
+  | <LT:("<")>
+  | <LTEQ:("<=")>
+  | <GT:(">")>
+  | <GTEQ:(">=")>
+  | <COMMA:(",")>
+  | <COLON:(":")>
+  | <SCOLON:(";")>
+  | <ASIGN:("=")>
+  | <PLUS:("+")>
+  | <MINUS:("-")>
+  | <TILDA:("~")>
+  | <#DIGIT: ["0"-"9"]>
+}
+
+//Reserved Tokens
+TOKEN :
+{
+    <VAR: "var">
+|  <CONST: "const">
+|  <RET: "return">
+|  <INT: "integer">
+|  <BOOL: "boolean">
+|  <VOID: "void">
+|  <MAIN: "main">
+|  <IF: "if">
+|  <ELSE: "else">
+|  <TRUE: "true">
+|  <FALSE: "false">
+|  <WHILE: "while">
+|  <BEGIN: "begin">
+|  <END: "end">
+|  <IS: "is">
+|  <SKI: ("skip")>
+
+}
+
+//Identifier Token
+TOKEN : {
+ <IDENTIFIER: <LETTER>(<LETTER>|<DIGIT>)*(["$"])?>
+|  <#LETTER: (["a"-"z","A"-"Z"])>
+}
+
+
+//MAIN UNIT
+void Start () : {}
+{
+  (
+    <MAIN> | <BEGIN>
+  )*
+  <END>
+}
