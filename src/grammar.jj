@@ -55,7 +55,7 @@ TOKEN_MGR_DECLS :
     static int commentNesting = 0;
 }
 
-SKIP: { "\n" | "\r" | "\r\n" |"\\"|"\t"|" "}
+SKIP: { "\n" | "\r" | "\r\n" |"\t"|" "}
 
 //Comment Skips
 SKIP :
@@ -75,70 +75,208 @@ SKIP :
 
 }
 
-//STATIC TOKENS
-TOKEN : {
- <INTEGER_CONSTANT: (<DIGIT>)+>
-|  <LOGIC_CONSTANT: "true" | "false" | "-1">
-|  <STRING_CONSTANT: "\"" ( ~["\"","\\","\n","\r"] | "\\" ( ["n","t","b","r","f","\\","\'","\""] | ( ["\n","\r"] | "\r\n")))* "\"">
-}
-
-//Static Tokens
 TOKEN :
 {
-    <OBRA :("(")>
-  | <CBRA:(")")>
-  | <AND:("&&")>
-  | <OR:("||")>
-  | <EQ:("==")>
-  | <NOTEQ:("!=")>
-  | <LT:("<")>
-  | <LTEQ:("<=")>
-  | <GT:(">")>
-  | <GTEQ:(">=")>
-  | <COMMA:(",")>
-  | <COLON:(":")>
-  | <SCOLON:(";")>
-  | <ASIGN:("=")>
-  | <PLUS:("+")>
-  | <MINUS:("-")>
-  | <TILDA:("~")>
-  | <#DIGIT: ["0"-"9"]>
-}
-
-//Reserved Tokens
-TOKEN :
-{
-    <VAR: "var">
-|  <CONST: "const">
-|  <RET: "return">
-|  <INT: "integer">
-|  <BOOL: "boolean">
-|  <VOID: "void">
-|  <MAIN: "main">
-|  <IF: "if">
-|  <ELSE: "else">
-|  <TRUE: "true">
-|  <FALSE: "false">
-|  <WHILE: "while">
-|  <BEGIN: "begin">
-|  <END: "end">
-|  <IS: "is">
-|  <SKI: ("skip")>
-
-}
-
-//Identifier Token
-TOKEN : {
- <IDENTIFIER: <LETTER>(<LETTER>|<DIGIT>)*(["$"])?>
-|  <#LETTER: (["a"-"z","A"-"Z"])>
+      <ASIGN:("=")>
+    | <PLUS:("+")>
+    | <MINUS:("-")>
+    | <TILDA:("~")>
+    | <OR:("||")>
+    | <AND:("&&")>
+    | <EQ:("==")>
+    | <NOTEQ:("!=")>
+    | <LT:("<")>
+    | <LTEQ:("<=")>
+    | <GT:(">")>
+    | <GTEQ:(">=")>
+    | <COMMA:(",")>
+    | <COLON:(":")>
+    | <SCOLON:(";")>
+    | <OBRA :("(")>
+    | <CBRA:(")")>
+    | <VAR: "var">
+    | <CONST: "const">
+    | <RET: "return">
+    | <INT: "integer">
+    | <BOOL: "boolean">
+    | <VOID: "void">
+    | <MAIN: "main">
+    | <IF: "if">
+    | <ELSE: "else">
+    | <TRUE: "true">
+    | <FALSE: "false">
+    | <WHILE: "while">
+    | <BEGIN: "begin">
+    | <END: "end">
+    | <IS: "is">
+    | <SKI: ("skip")>
+    | <DIGIT: ["0"-"9"]>
+    | <LETTER: (["a"-"z","A"-"Z"])>
+    | <IDENTIFIER: <LETTER>(<LETTER>|<DIGIT>)*>
+    | <EMPTY: "" > : DEFAULT
 }
 
 
-//MAIN UNIT
+//TOKEN:{
+//    <NEMP_ARG_LIST: <IDENTIFIER> | (<IDENTIFIER><COMMA>)*>
+//    |<ARG_LIST: <NEMP_ARG_LIST> | <EMPTY>>
+//    |<COMP_OP: <EQ> | <NOTEQ> | <LT> | <LTEQ> | <GT> | <GTEQ>>
+//    |<CONDITION: (<TILDA>)*
+//        | (<OBRA>)*(<CBRA>)*
+//        | <EXPRESSION><COMP_OP><EXPRESSION>
+//        |(<AND><OR>)*>
+//    |<FRAGMENT: <IDENTIFIER> | <MINUS><IDENTIFIER>|<DIGIT>|<TRUE>|<FALSE>>
+//    |<EXPRESSION: <FRAGMENT><BINARY_ARITH_OP><FRAGMENT>
+//        |(<OBRA>)*(<CBRA>)*
+//        |<IDENTIFIER><OBRA><ARG_LIST><CBRA>
+//        | <FRAGMENT>>
+//    |<STATEMENT: <IDENTIFIER><ASIGN><EXPRESSION><SCOLON>
+//        | <IDENTIFIER><OBRA><ARG_LIST><CBRA><SCOLON>
+//        | (<BEGIN>)*(<END>)*
+//        | (<IF><CONDITION><BEGIN>)*(<END>)*
+//        | (<ELSE><BEGIN>)*(<END>)*
+//        | (<WHILE><BEGIN>)*(<END>)*
+//        | <SKI><SCOLON>>
+//    |<STATEMENT_BLOCK: (<STATEMENT>)* | <EMPTY>>
+//    |<MAIN_BLOCK: <MAIN><BEGIN><DECL_LIST><STATEMENT_BLOCK><END>>
+//    |<NEMP_PARAM_LIST: <IDENTIFIER><COLON><TYPE> |
+//            (<IDENTIFIER><COLON><TYPE><COMMA>)*>
+//    |<PARAM_LIST: <NEMP_PARAM_LIST> | <EMPTY>>
+//    |<TYPE: <INT> | <BOOL>| <VOID>>
+//    |<FUNCTION: <TYPE><IDENTIFIER><OBRA><PARAM_LIST><CBRA><IS><DECL_LIST><BEGIN><STATEMENT_BLOCK><RET><OBRA>(<EXPRESSION> | <EMPTY>)<CBRA><END>>
+//    |<FUNCTION_LIST: (<FUNCTION>)*|<EMPTY>>
+//    |<CONST_DECL: <CONST><IDENTIFIER><COLON><TYPE><ASIGN><EXPRESSION>>
+//    |<VAR_DECL: <VAR><IDENTIFIER><COLON><TYPE>>
+//    |<DECL: <VAR_DECL> | <CONST_DECL>>
+//    |<DECL_LIST: (<DECL><SCOLON>)*|<EMPTY>>
+//    |<PROGRAM: <DECL_LIST><FUNCTION_LIST><MAIN>>
+//}
+
 void Start () : {}
 {
-  (
-    <MAIN> | <BEGIN>
-  )*
-  <END>
+  Programme()
+}
+
+void Programme () : {}
+{
+    declarationList()
+    functionList()
+    //mainMethod()
+}
+
+void functionList () : {}
+{
+    function()
+}
+
+void function () : {}
+{
+    type()identifier()<OBRA>paramList()<CBRA><IS>declarationList()<BEGIN>statementBlock()<RET><OBRA>(expression() | <EMPTY>)<CBRA><END>
+}
+
+void paramList () : {}
+{
+    nonEmptyParamList() | <EMPTY>
+}
+
+void nonEmptyParamList () : {}
+{
+    identifier()<COLON>type()(identifier()<COLON>type()<COMMA>)*
+}
+
+void statementBlock () : {}
+{
+    statement()
+}
+
+void statement () : {}
+{
+
+    identifier()(<ASIGN>expression()| <OBRA>argList()<CBRA>)<SCOLON>
+    | (<IF> | <WHILE>) condition() <BEGIN> statementBlock() <END>
+    | (<ELSE> | <EMPTY>) <BEGIN> statementBlock() <END>
+    | <SKI>
+}
+
+void condition () : {}
+{
+    (<EMPTY> | <TILDA> | <OBRA>)expression()comparisionOp()expression()((<OR> | <AND>)expression()comparisionOp()expression())*(<EMPTY> | <CBRA>)
+}
+
+void comparisionOp () : {}
+{
+    <EQ> | <NOTEQ> | <LT> | <LTEQ> | <GT> | <GTEQ>
+}
+
+void declarationList () : {}
+{
+    declaration()<SCOLON>
+}
+
+void declaration () : {}
+{
+    varDeclaration()|constDeclaration() {System.out.println("Declaration");}
+}
+
+void constDeclaration () : {}
+{
+    <CONST>identifier()<COLON>type()<ASIGN>expression() {System.out.println("Const decalration");}
+}
+
+void varDeclaration () : {}
+{
+    <VAR><IDENTIFIER><COLON>type() {System.out.println("Var declaration");}
+}
+
+void expression () : {}
+{
+    LOOKAHEAD(2) fragment() | fragment()(
+                BinOp()fragment() {System.out.println("Bin Op");}
+                | <OBRA>argList()<CBRA> {System.out.println("Arg list");}
+                )
+    |<OBRA>expression()<CBRA>
+}
+
+void fragment () : {}
+{
+    identifier() {System.out.println("Identifier Fragment");}
+    | <MINUS>identifier(){System.out.println("Negative identifier");}
+    | <DIGIT>{System.out.println("Number fragment");}
+    | boolOp(){System.out.println("Boolean fragment");}
+
+}
+
+void argList () : {}
+{
+    nonEmptyArgList() | <EMPTY>
+}
+
+void nonEmptyArgList () : {}
+{
+    identifier()
+}
+
+void identifier () : {}
+{
+    <IDENTIFIER>{System.out.println("IDENTIFIER");}
+}
+
+void type () : {}
+{
+    <INT> {System.out.println("Integer Type");}
+    |<BOOL> {System.out.println("Boolean Type");}
+    |<VOID> {System.out.println("Void Type");}
+}
+
+void boolOp() : {}
+{
+    <TRUE>{System.out.println("True");}
+    |<FALSE>{System.out.println("False");}
+}
+
+
+void BinOp() : {}
+{
+    <PLUS> {System.out.println("Plus operator");}
+    |<MINUS> {System.out.println("Minus operator");}
 }
