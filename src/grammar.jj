@@ -110,47 +110,11 @@ TOKEN :
     | <END: "end">
     | <IS: "is">
     | <SKI: ("skip")>
+    | <IDENTIFIER: <LETTER>(<LETTER>|<DIGIT>|<SPECHAR>)*>
     | <DIGIT: ["0"-"9"]>
     | <LETTER: (["a"-"z","A"-"Z"])>
-    | <IDENTIFIER: <LETTER>(<LETTER>|<DIGIT>)*>
-    | <EMPTY: "" > : DEFAULT
+    | <SPECHAR : "_">
 }
-
-
-//TOKEN:{
-//    <NEMP_ARG_LIST: <IDENTIFIER> | (<IDENTIFIER><COMMA>)*>
-//    |<ARG_LIST: <NEMP_ARG_LIST> | <EMPTY>>
-//    |<COMP_OP: <EQ> | <NOTEQ> | <LT> | <LTEQ> | <GT> | <GTEQ>>
-//    |<CONDITION: (<TILDA>)*
-//        | (<OBRA>)*(<CBRA>)*
-//        | <EXPRESSION><COMP_OP><EXPRESSION>
-//        |(<AND><OR>)*>
-//    |<FRAGMENT: <IDENTIFIER> | <MINUS><IDENTIFIER>|<DIGIT>|<TRUE>|<FALSE>>
-//    |<EXPRESSION: <FRAGMENT><BINARY_ARITH_OP><FRAGMENT>
-//        |(<OBRA>)*(<CBRA>)*
-//        |<IDENTIFIER><OBRA><ARG_LIST><CBRA>
-//        | <FRAGMENT>>
-//    |<STATEMENT: <IDENTIFIER><ASIGN><EXPRESSION><SCOLON>
-//        | <IDENTIFIER><OBRA><ARG_LIST><CBRA><SCOLON>
-//        | (<BEGIN>)*(<END>)*
-//        | (<IF><CONDITION><BEGIN>)*(<END>)*
-//        | (<ELSE><BEGIN>)*(<END>)*
-//        | (<WHILE><BEGIN>)*(<END>)*
-//        | <SKI><SCOLON>>
-//    |<STATEMENT_BLOCK: (<STATEMENT>)* | <EMPTY>>
-//    |<MAIN_BLOCK: <MAIN><BEGIN><DECL_LIST><STATEMENT_BLOCK><END>>
-//    |<NEMP_PARAM_LIST: <IDENTIFIER><COLON><TYPE> |
-//            (<IDENTIFIER><COLON><TYPE><COMMA>)*>
-//    |<PARAM_LIST: <NEMP_PARAM_LIST> | <EMPTY>>
-//    |<TYPE: <INT> | <BOOL>| <VOID>>
-//    |<FUNCTION: <TYPE><IDENTIFIER><OBRA><PARAM_LIST><CBRA><IS><DECL_LIST><BEGIN><STATEMENT_BLOCK><RET><OBRA>(<EXPRESSION> | <EMPTY>)<CBRA><END>>
-//    |<FUNCTION_LIST: (<FUNCTION>)*|<EMPTY>>
-//    |<CONST_DECL: <CONST><IDENTIFIER><COLON><TYPE><ASIGN><EXPRESSION>>
-//    |<VAR_DECL: <VAR><IDENTIFIER><COLON><TYPE>>
-//    |<DECL: <VAR_DECL> | <CONST_DECL>>
-//    |<DECL_LIST: (<DECL><SCOLON>)*|<EMPTY>>
-//    |<PROGRAM: <DECL_LIST><FUNCTION_LIST><MAIN>>
-//}
 
 void Start () : {}
 {
@@ -161,46 +125,60 @@ void Programme () : {}
 {
     declarationList()
     functionList()
-    //mainMethod()
+    mainMethod()
+}
+
+void mainMethod () : {}
+{
+    <MAIN><BEGIN>declarationList()statementBlock()<END>
 }
 
 void functionList () : {}
 {
-    function()
+    (function())+|{}
 }
 
 void function () : {}
 {
-    type()identifier()<OBRA>paramList()<CBRA><IS>declarationList()<BEGIN>statementBlock()<RET><OBRA>(expression() | <EMPTY>)<CBRA><END>
+    type()identifier()<OBRA>paramList()<CBRA><IS>declarationList()<BEGIN>statementBlock()<RET><OBRA>(expression() | {})<CBRA><SCOLON><END>
 }
 
 void paramList () : {}
 {
-    nonEmptyParamList() | <EMPTY>
+    nonEmptyParamList() | {}
 }
 
 void nonEmptyParamList () : {}
 {
-    identifier()<COLON>type()(identifier()<COLON>type()<COMMA>)*
+    ((<COMMA>|{})identifier()<COLON>type())+
+
 }
 
 void statementBlock () : {}
 {
-    statement()
+    (statement())+|{}
 }
 
 void statement () : {}
 {
 
     identifier()(<ASIGN>expression()| <OBRA>argList()<CBRA>)<SCOLON>
-    | (<IF> | <WHILE>) condition() <BEGIN> statementBlock() <END>
-    | (<ELSE> | <EMPTY>) <BEGIN> statementBlock() <END>
-    | <SKI>
+    | (<IF> | <WHILE>) conditionInteraction() <BEGIN> statementBlock() <END>
+    | (<ELSE> | {}) <BEGIN> statementBlock() <END>
+    | <SKI><SCOLON>
 }
 
 void condition () : {}
 {
-    (<EMPTY> | <TILDA> | <OBRA>)expression()comparisionOp()expression()((<OR> | <AND>)expression()comparisionOp()expression())*(<EMPTY> | <CBRA>)
+    (<OBRA> | {})
+    expression()comparisionOp()expression()
+    (<CBRA> | {})
+}
+
+void conditionInteraction () : {}
+{
+
+    (<TILDA> | {})condition()((<OR> | <AND>)condition())*
 }
 
 void comparisionOp () : {}
@@ -210,7 +188,7 @@ void comparisionOp () : {}
 
 void declarationList () : {}
 {
-    declaration()<SCOLON>
+    (declaration()<SCOLON>)+|{}
 }
 
 void declaration () : {}
@@ -230,17 +208,14 @@ void varDeclaration () : {}
 
 void expression () : {}
 {
-    LOOKAHEAD(2) fragment() | fragment()(
-                BinOp()fragment() {System.out.println("Bin Op");}
-                | <OBRA>argList()<CBRA> {System.out.println("Arg list");}
-                )
+    fragment()(BinOp()fragment() | {})
+    |identifier()(<OBRA>argList()<CBRA>|BinOp()(identifier()|fragment())|{})
     |<OBRA>expression()<CBRA>
 }
 
 void fragment () : {}
 {
-    identifier() {System.out.println("Identifier Fragment");}
-    | <MINUS>identifier(){System.out.println("Negative identifier");}
+    <MINUS>(identifier()|<DIGIT>){System.out.println("Negative identifier");}
     | <DIGIT>{System.out.println("Number fragment");}
     | boolOp(){System.out.println("Boolean fragment");}
 
@@ -248,12 +223,12 @@ void fragment () : {}
 
 void argList () : {}
 {
-    nonEmptyArgList() | <EMPTY>
+    nonEmptyArgList() | {}
 }
 
 void nonEmptyArgList () : {}
 {
-    identifier()
+    ((<COMMA>|{})identifier())+
 }
 
 void identifier () : {}
