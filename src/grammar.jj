@@ -35,7 +35,7 @@ public class CCALParser {
           }
           try {
             Start();
-            System.out.println ("CCALParser: The input was readed sucessfully.");
+            System.out.println ("CCALParser: The input was read successfully.");
           }
           catch(ParseException e){
             System.out.println ("CCALParser: There was an error during the parse.");
@@ -118,19 +118,23 @@ TOKEN :
 
 void Start () : {}
 {
-  Programme()
+  Programme(){System.out.println("Programme");}
 }
 
 void Programme () : {}
 {
-    declarationList()
-    functionList()
-    mainMethod()
+    declarationList(){System.out.println("Declaration List");}
+    functionList(){System.out.println("Function List");}
+    mainMethod(){System.out.println("Main Method");}
 }
 
 void mainMethod () : {}
 {
-    <MAIN><BEGIN>declarationList()statementBlock()<END>
+    <MAIN> {System.out.println("Begin");}
+    <BEGIN> {System.out.println("Main");}
+    declarationList() {System.out.println("Declaration List");}
+    statementBlock() {System.out.println("Statement Block");}
+    <END> {System.out.println("End");}
 }
 
 void functionList () : {}
@@ -140,7 +144,12 @@ void functionList () : {}
 
 void function () : {}
 {
-    type()identifier()<OBRA>paramList()<CBRA><IS>declarationList()<BEGIN>statementBlock()<RET><OBRA>(expression() | {})<CBRA><SCOLON><END>
+    type() identifier()<OBRA>paramList()<CBRA><IS> {System.out.println("Function Header");}
+    declarationList() {System.out.println("Declaration List");}
+    <BEGIN> {System.out.println("Begin Function");}
+    statementBlock() {System.out.println("Function Statement Block");}
+    <RET><OBRA>(expression() | {})<CBRA><SCOLON> {System.out.println("Function return");}
+    <END>{System.out.println("End Function");}
 }
 
 void paramList () : {}
@@ -156,7 +165,8 @@ void nonEmptyParamList () : {}
 
 void statementBlock () : {}
 {
-    (statement())+|{}
+    (statement())+{System.out.println("Statement");}
+    |{}
 }
 
 void statement () : {}
@@ -168,22 +178,31 @@ void statement () : {}
     | <SKI><SCOLON>
 }
 
-void condition () : {}
+int condition (int bracketCount) : {}
 {
-    (<OBRA> | {})
+    (<OBRA> {bracketCount++; System.out.println("Open Bracket");} | {})
     expression()comparisionOp()expression()
-    (<CBRA> | {})
+    (<CBRA>{bracketCount--; System.out.println("Close Bracket");} | {})
+    {return bracketCount;}
 }
 
-void conditionInteraction () : {}
+void conditionInteraction () : {
+int bracketCount = 0;
+}
 {
 
-    (<TILDA> | {})condition()((<OR> | <AND>)condition())*
+    (<TILDA> | {}){bracketCount = condition(bracketCount); System.out.println("Bracket Count = " + bracketCount);}
+    ((<OR> | <AND>){bracketCount = condition(bracketCount); System.out.println("Bracket Count = " + bracketCount);})*{if(bracketCount != 0) throw new ParseException("Brackets not closed correctly");}
 }
 
 void comparisionOp () : {}
 {
-    <EQ> | <NOTEQ> | <LT> | <LTEQ> | <GT> | <GTEQ>
+    <EQ> {System.out.println("Equals Operator");}
+    | <NOTEQ> {System.out.println("Not Equals Operator");}
+    | <LT> {System.out.println("Less Than Operator");}
+    | <LTEQ> {System.out.println("Less Than Equals Operator");}
+    | <GT> {System.out.println("Greater Than Operator");}
+    | <GTEQ> {System.out.println("Greater Than Equals Operator");}
 }
 
 void declarationList () : {}
@@ -211,6 +230,8 @@ void expression () : {}
     fragment()(BinOp()fragment() | {})
     |identifier()(<OBRA>argList()<CBRA>|BinOp()(identifier()|fragment())|{})
     |<OBRA>expression()<CBRA>
+
+    {System.out.println("Expression");}
 }
 
 void fragment () : {}
@@ -233,7 +254,7 @@ void nonEmptyArgList () : {}
 
 void identifier () : {}
 {
-    <IDENTIFIER>{System.out.println("IDENTIFIER");}
+    <IDENTIFIER>{System.out.println("Identifier");}
 }
 
 void type () : {}
