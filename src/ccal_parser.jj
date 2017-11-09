@@ -1,4 +1,3 @@
-/* Sample grammar file*/
 options {
    IGNORE_CASE = true;
  }
@@ -55,6 +54,7 @@ TOKEN_MGR_DECLS :
     static int commentNesting = 0;
 }
 
+//Newline/space skips
 SKIP: { "\n" | "\r" | "\r\n" |"\t"|" "}
 
 //Comment Skips
@@ -92,8 +92,8 @@ TOKEN :
     | <COMMA:(",")>
     | <COLON:(":")>
     | <SCOLON:(";")>
-    | <OBRA :("(")>
-    | <CBRA:(")")>
+    | <OPBRA :("(")>
+    | <CLBRA:(")")>
     | <VAR: "var">
     | <CONST: "const">
     | <RET: "return">
@@ -113,14 +113,16 @@ TOKEN :
     | <IDENTIFIER: <LETTER>(<LETTER>|<DIGIT>|<SPECHAR>)*>
     | <DIGIT: ["0"-"9"]>
     | <LETTER: (["a"-"z","A"-"Z"])>
-    | <SPECHAR : "_">
+    | <SPECHAR : "_"> //special characters used in variable names
 }
 
+//Start the parsing here
 void Start () : {}
 {
   Programme(){System.out.println("Programme");}
 }
 
+//Break down the programme into a list of declarations,functions and it's main method
 void Programme () : {}
 {
     declarationList(){System.out.println("Declaration List");}
@@ -128,6 +130,7 @@ void Programme () : {}
     mainMethod(){System.out.println("Main Method");}
 }
 
+//Take the structure of a main method and make sub calls to the inner structures
 void mainMethod () : {}
 {
     <MAIN> {System.out.println("Begin");}
@@ -137,55 +140,63 @@ void mainMethod () : {}
     <END> {System.out.println("End");}
 }
 
+//Made up of zero or more functions
 void functionList () : {}
 {
-    (function())+|{}
+    (function())*
 }
 
+//Function broken down into tokens
 void function () : {}
 {
-    type() identifier()<OBRA>paramList()<CBRA><IS> {System.out.println("Function Header");}
+    type() identifier()<OPBRA>paramList()<CLBRA><IS> {System.out.println("Function Header");}
     declarationList() {System.out.println("Declaration List");}
     <BEGIN> {System.out.println("Begin Function");}
     statementBlock() {System.out.println("Function Statement Block");}
-    <RET><OBRA>(expression() | {})<CBRA><SCOLON> {System.out.println("Function return");}
+    <RET><OPBRA>(expression() | {})<CLBRA><SCOLON> {System.out.println("Function return");}
     <END>{System.out.println("End Function");}
 }
 
+//Can be a non empty list or nothing at all
 void paramList () : {}
 {
     nonEmptyParamList() | {}
 }
 
+//Made up of one or more parameters 
+//take into account multiple parameters by having a comma or nothing at the start
 void nonEmptyParamList () : {}
 {
     ((<COMMA>|{})identifier()<COLON>type())+
 
 }
 
+//A statement block can have zero or more statements
 void statementBlock () : {}
 {
-    (statement())+{System.out.println("Statement");}
-    |{}
+    (statement())*{System.out.println("Statement");}
 }
 
+//Break statement structure down into tokesn
 void statement () : {}
 {
-
-    identifier()(<ASIGN>expression()| <OBRA>argList()<CBRA>)<SCOLON>
+    //Take multiple options for a statement into account in one line
+    identifier()(<ASIGN>expression()| <OPBRA>argList()<CLBRA>)<SCOLON>
     | (<IF> | <WHILE>) conditionInteraction() <BEGIN> statementBlock() <END>
     | (<ELSE> | {}) <BEGIN> statementBlock() <END>
     | <SKI><SCOLON>
 }
 
+//Tokenize structure of condition and return back the amount of brackets used
 int condition (int bracketCount) : {}
 {
-    (<OBRA> {bracketCount++; System.out.println("Open Bracket");} | {})
+    (<OPBRA> {bracketCount++; System.out.println("Open Bracket");} | {})
     expression()comparisionOp()expression()
-    (<CBRA>{bracketCount--; System.out.println("Close Bracket");} | {})
+    (<CLBRA>{bracketCount--; System.out.println("Close Bracket");} | {})
     {return bracketCount;}
 }
 
+//Tokenize one or more conditions while keeping trakc of any brackets/nested brackets 
 void conditionInteraction () : {
 int bracketCount = 0;
 }
@@ -195,6 +206,7 @@ int bracketCount = 0;
     ((<OR> | <AND>){bracketCount = condition(bracketCount); System.out.println("Bracket Count = " + bracketCount);})*{if(bracketCount != 0) throw new ParseException("Brackets not closed correctly");}
 }
 
+//Comparison operators
 void comparisionOp () : {}
 {
     <EQ> {System.out.println("Equals Operator");}
@@ -205,35 +217,47 @@ void comparisionOp () : {}
     | <GTEQ> {System.out.println("Greater Than Equals Operator");}
 }
 
+//Zero or more declarations
 void declarationList () : {}
 {
-    (declaration()<SCOLON>)+|{}
+    (declaration()<SCOLON>)*
 }
 
+//A declaration can be a variable declaration or a constant decalration
 void declaration () : {}
 {
     varDeclaration()|constDeclaration() {System.out.println("Declaration");}
 }
 
+//Tokenize constant decalration
 void constDeclaration () : {}
 {
     <CONST>identifier()<COLON>type()<ASIGN>expression() {System.out.println("Const decalration");}
 }
 
+//Tokenize variable decalration
 void varDeclaration () : {}
 {
     <VAR><IDENTIFIER><COLON>type() {System.out.println("Var declaration");}
 }
 
+//Tokenize structure of expression
 void expression () : {}
 {
-    fragment()(BinOp()fragment() | {})
-    |identifier()(<OBRA>argList()<CBRA>|BinOp()(identifier()|fragment())|{})
-    |<OBRA>expression()<CBRA>
+    //Moved some of the structure of a fragment into the expression
+    /*
+    As an identifier is part of a fragment and expression there is no need to have it in both,
+    by removing it from a fragment we remove the need for a lookahead to see which tokens we should be 
+    reading in after
+    */
+    fragment()(binOp()fragment() | {}) //still keeping posibility of negative identifier from fragment
+    |identifier()(<OPBRA>argList()<CLBRA>|binOp()(identifier()|fragment())|{}) //positive identifier from fragment integrated here
+    |<OPBRA>expression()<CLBRA>
 
     {System.out.println("Expression");}
 }
 
+//Tokenize the remaining structures of a fragment
 void fragment () : {}
 {
     <MINUS>(identifier()|<DIGIT>){System.out.println("Negative identifier");}
@@ -242,21 +266,25 @@ void fragment () : {}
 
 }
 
+//Can be a non empty list of arguments or nothing
 void argList () : {}
 {
     nonEmptyArgList() | {}
 }
 
+//Can be one or more arguments (with a comma at the start to allow for multiples)
 void nonEmptyArgList () : {}
 {
     ((<COMMA>|{})identifier())+
 }
 
+//Tokenize identifier
 void identifier () : {}
 {
     <IDENTIFIER>{System.out.println("Identifier");}
 }
 
+//Tokenize structure of a type
 void type () : {}
 {
     <INT> {System.out.println("Integer Type");}
@@ -264,14 +292,15 @@ void type () : {}
     |<VOID> {System.out.println("Void Type");}
 }
 
+//Boolean operations
 void boolOp() : {}
 {
     <TRUE>{System.out.println("True");}
     |<FALSE>{System.out.println("False");}
 }
 
-
-void BinOp() : {}
+//Binary operations
+void binOp() : {}
 {
     <PLUS> {System.out.println("Plus operator");}
     |<MINUS> {System.out.println("Minus operator");}
