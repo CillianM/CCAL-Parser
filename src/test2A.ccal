@@ -1,0 +1,10 @@
+void func () is
+begin
+  return ();
+end
+
+main
+begin
+  func ();
+  func();
+end

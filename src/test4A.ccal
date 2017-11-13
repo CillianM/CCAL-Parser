@@ -3,21 +3,21 @@ integer multiply (x:integer, y:integer) is
   var minus_sign : boolean;
 begin
   // figure out sign of result and convert args to absolute values
-  if ( x < 0 && y >= 0)
+  if  x < 0 && y >= 0)
   begin
     minus_sign = true;
     x = -x;
   end
   else
   begin
-    if y < 0 && x >= 0
+    if y < 0 && x >= 0 || x < -5
     begin
       minus_sign = true;
       y = -y ;
     end
     else
     begin
-      if ( x < 0) && y < 0
+      if  x < 0) && y < 0
       begin
         minus_sign = false;
         x = -x;
@@ -59,3 +59,4 @@ begin
   arg_2 = five ;
   result = multiply ( arg_1, arg_2 );
 end
+

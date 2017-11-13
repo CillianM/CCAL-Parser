@@ -1,7 +1,14 @@
+/*
+Here are the options for the programme as a whole. All we need is to ignore cases so we place that option here
+*/
 options {
    IGNORE_CASE = true;
  }
 
+/*
+    Here we start the definition of our parser. This defines the entry through which the parsing will begin. 
+    We allow for a file to be passed in or for tokens to be fed into the command line
+*/
 PARSER_BEGIN(CCALParser)
 
 public class CCALParser {
@@ -33,7 +40,7 @@ public class CCALParser {
             return ;
           }
           try {
-            Start();
+            Programme();
             System.out.println ("CCALParser: The input was read successfully.");
           }
           catch(ParseException e){
@@ -48,6 +55,10 @@ public class CCALParser {
     }
 
 PARSER_END (CCALParser)
+
+/*
+    Below defines what we'll ignore during the parsing, this includes new lines and nested comments
+*/
 
 TOKEN_MGR_DECLS :
 {
@@ -74,6 +85,10 @@ SKIP :
    |<~[]>
 
 }
+
+/*
+    These are the accepted tokens used within the language defined through http://www.computing.dcu.ie/~davids/courses/CA4003/ccal.pdf
+*/
 
 TOKEN :
 {
@@ -111,17 +126,12 @@ TOKEN :
     | <IS: "is">
     | <SKI: ("skip")>
     | <IDENTIFIER: <LETTER>(<LETTER>|<DIGIT>|<SPECHAR>)*>
-    | <DIGIT: ["0"-"9"]>
+    | <DIGIT: "0" | ("-")? ["1" - "9"] (["0" - "9"])*> //Ensure 0s are taken care of in any form
     | <LETTER: (["a"-"z","A"-"Z"])>
     | <SPECHAR : "_"> //special characters used in variable names
 }
 
 //Start the parsing here
-void Start () : {}
-{
-  Programme(){System.out.println("Programme");}
-}
-
 //Break down the programme into a list of declarations,functions and it's main method
 void Programme () : {}
 {
@@ -157,18 +167,10 @@ void function () : {}
     <END>{System.out.println("End Function");}
 }
 
-//Can be a non empty list or nothing at all
+//Can be a list of parameters or nothing at all
 void paramList () : {}
 {
-    nonEmptyParamList() | {}
-}
-
-//Made up of one or more parameters 
-//take into account multiple parameters by having a comma or nothing at the start
-void nonEmptyParamList () : {}
-{
-    ((<COMMA>|{})identifier()<COLON>type())+
-
+    ((<COMMA>|{})identifier()<COLON>type())+ | {}
 }
 
 //A statement block can have zero or more statements
@@ -266,16 +268,10 @@ void fragment () : {}
 
 }
 
-//Can be a non empty list of arguments or nothing
+//Can be a list of arguments or nothing
 void argList () : {}
 {
-    nonEmptyArgList() | {}
-}
-
-//Can be one or more arguments (with a comma at the start to allow for multiples)
-void nonEmptyArgList () : {}
-{
-    ((<COMMA>|{})identifier())+
+    ((<COMMA>|{})identifier())+ | {}
 }
 
 //Tokenize identifier

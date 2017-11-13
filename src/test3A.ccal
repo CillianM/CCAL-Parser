@@ -1,0 +1,14 @@
+var i:integer;
+integer test_fn (x_fhdhfj00_:integer) is
+  var i:integer;
+begin
+  i_ = 10010;
+  return (y);
+end
+
+main
+begin
+  var i:integer;
+  i = 1;
+  i = test_fn (i);
+end

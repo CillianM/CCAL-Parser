@@ -1,4 +1,4 @@
 
 @echo off
 
-javacc grammar.jj & javac *.java
+javacc ccal_parser.jj & javac *.java
