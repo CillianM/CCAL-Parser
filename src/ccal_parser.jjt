@@ -3,6 +3,10 @@ Here are the options for the programme as a whole. All we need is to ignore case
 */
 options {
    IGNORE_CASE = true;
+   MULTI=true;
+   VISITOR=true;
+   NODE_DEFAULT_VOID=true;
+   NODE_EXTENDS="BaseNode";
  }
 
 /*
@@ -133,7 +137,7 @@ TOKEN :
 
 //Start the parsing here
 //Break down the programme into a list of declarations,functions and it's main method
-void Programme () : {}
+void Programme () #programme: {}
 {
     declarationList(){System.out.println("Declaration List");}
     functionList(){System.out.println("Function List");}
@@ -141,7 +145,7 @@ void Programme () : {}
 }
 
 //Take the structure of a main method and make sub calls to the inner structures
-void mainMethod () : {}
+void mainMethod () #main: {}
 {
     <MAIN> {System.out.println("Begin");}
     <BEGIN> {System.out.println("Main");}
@@ -151,7 +155,7 @@ void mainMethod () : {}
 }
 
 //Made up of zero or more functions
-void functionList () : {}
+void functionList () #funtionList: {}
 {
     (function())*
 }

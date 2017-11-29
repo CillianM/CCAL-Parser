@@ -3,6 +3,10 @@
 
 # Java Files
 *.java
+!BaseNode.java
+
+# JJ Files
+*.jj
 
 # Log file
 *.log
