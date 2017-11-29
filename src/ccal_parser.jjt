@@ -44,8 +44,10 @@ public class CCALParser {
             return ;
           }
           try {
-            Programme();
+            SimpleNode root = parser.Programme();
+            root.dump("");
             System.out.println ("CCALParser: The input was read successfully.");
+
           }
           catch(ParseException e){
             System.out.println ("CCALParser: There was an error during the parse.");
@@ -137,21 +139,22 @@ TOKEN :
 
 //Start the parsing here
 //Break down the programme into a list of declarations,functions and it's main method
-void Programme () #programme: {}
+SimpleNode Programme () #programme: {}
 {
-    declarationList(){System.out.println("Declaration List");}
-    functionList(){System.out.println("Function List");}
-    mainMethod(){System.out.println("Main Method");}
+    declarationList(){}
+    functionList(){}
+    mainMethod(){}
+    {return jjtThis;}
 }
 
 //Take the structure of a main method and make sub calls to the inner structures
 void mainMethod () #main: {}
 {
-    <MAIN> {System.out.println("Begin");}
-    <BEGIN> {System.out.println("Main");}
-    declarationList() {System.out.println("Declaration List");}
-    statementBlock() {System.out.println("Statement Block");}
-    <END> {System.out.println("End");}
+    <MAIN> {}
+    <BEGIN> {}
+    declarationList() {}
+    statementBlock() {}
+    <END> {}
 }
 
 //Made up of zero or more functions
@@ -161,30 +164,30 @@ void functionList () #funtionList: {}
 }
 
 //Function broken down into tokens
-void function () : {}
+void function () #function: {}
 {
-    type() identifier()<OPBRA>paramList()<CLBRA><IS> {System.out.println("Function Header");}
-    declarationList() {System.out.println("Declaration List");}
-    <BEGIN> {System.out.println("Begin Function");}
-    statementBlock() {System.out.println("Function Statement Block");}
-    <RET><OPBRA>(expression() | {})<CLBRA><SCOLON> {System.out.println("Function return");}
-    <END>{System.out.println("End Function");}
+    type() identifier()<OPBRA>paramList()<CLBRA><IS> {}
+    declarationList() {}
+    <BEGIN> {}
+    statementBlock() {}
+    <RET><OPBRA>(expression() | {})<CLBRA><SCOLON> {}
+    <END>{}
 }
 
 //Can be a list of parameters or nothing at all
-void paramList () : {}
+void paramList () #paramlist: {}
 {
     ((<COMMA>|{})identifier()<COLON>type())+ | {}
 }
 
 //A statement block can have zero or more statements
-void statementBlock () : {}
+void statementBlock () #statementblock: {}
 {
-    (statement())*{System.out.println("Statement");}
+    (statement())*{}
 }
 
 //Break statement structure down into tokesn
-void statement () : {}
+void statement () #statement: {}
 {
     //Take multiple options for a statement into account in one line
     identifier()(<ASIGN>expression()| <OPBRA>argList()<CLBRA>)<SCOLON>
@@ -194,16 +197,16 @@ void statement () : {}
 }
 
 //Tokenize structure of condition and return back the amount of brackets used
-int condition (int bracketCount) : {}
+int condition (int bracketCount) #condition: {}
 {
-    (<OPBRA> {bracketCount++; System.out.println("Open Bracket");} | {})
+    (<OPBRA> {bracketCount++; } | {})
     expression()comparisionOp()expression()
-    (<CLBRA>{bracketCount--; System.out.println("Close Bracket");} | {})
+    (<CLBRA>{bracketCount--; } | {})
     {return bracketCount;}
 }
 
 //Tokenize one or more conditions while keeping trakc of any brackets/nested brackets 
-void conditionInteraction () : {
+void conditionInteraction () #conditioninteraction: {
 int bracketCount = 0;
 }
 {
@@ -213,42 +216,42 @@ int bracketCount = 0;
 }
 
 //Comparison operators
-void comparisionOp () : {}
+void comparisionOp () #comparisonoperator: {}
 {
-    <EQ> {System.out.println("Equals Operator");}
-    | <NOTEQ> {System.out.println("Not Equals Operator");}
-    | <LT> {System.out.println("Less Than Operator");}
-    | <LTEQ> {System.out.println("Less Than Equals Operator");}
-    | <GT> {System.out.println("Greater Than Operator");}
-    | <GTEQ> {System.out.println("Greater Than Equals Operator");}
+    <EQ> {}
+    | <NOTEQ> {}
+    | <LT> {}
+    | <LTEQ> {}
+    | <GT> {}
+    | <GTEQ> {}
 }
 
 //Zero or more declarations
-void declarationList () : {}
+void declarationList () #declarationlist: {}
 {
     (declaration()<SCOLON>)*
 }
 
 //A declaration can be a variable declaration or a constant decalration
-void declaration () : {}
+void declaration () #declaration: {}
 {
-    varDeclaration()|constDeclaration() {System.out.println("Declaration");}
+    varDeclaration()|constDeclaration() {}
 }
 
 //Tokenize constant decalration
-void constDeclaration () : {}
+void constDeclaration () #constdeclaration: {}
 {
-    <CONST>identifier()<COLON>type()<ASIGN>expression() {System.out.println("Const decalration");}
+    <CONST>identifier()<COLON>type()<ASIGN>expression() {}
 }
 
 //Tokenize variable decalration
-void varDeclaration () : {}
+void varDeclaration () #vardeclaration: {}
 {
-    <VAR><IDENTIFIER><COLON>type() {System.out.println("Var declaration");}
+    <VAR><IDENTIFIER><COLON>type() {}
 }
 
 //Tokenize structure of expression
-void expression () : {}
+void expression () #expression: {}
 {
     //Moved some of the structure of a fragment into the expression
     /*
@@ -260,48 +263,48 @@ void expression () : {}
     |identifier()(<OPBRA>argList()<CLBRA>|binOp()(identifier()|fragment())|{}) //positive identifier from fragment integrated here
     |<OPBRA>expression()<CLBRA>
 
-    {System.out.println("Expression");}
+    {}
 }
 
 //Tokenize the remaining structures of a fragment
-void fragment () : {}
+void fragment () #fragment: {}
 {
-    <MINUS>(identifier()|<DIGIT>){System.out.println("Negative identifier");}
-    | <DIGIT>{System.out.println("Number fragment");}
-    | boolOp(){System.out.println("Boolean fragment");}
+    <MINUS>(identifier()|<DIGIT>){}
+    | <DIGIT>{}
+    | boolOp(){}
 
 }
 
 //Can be a list of arguments or nothing
-void argList () : {}
+void argList () #argumentlist: {}
 {
     ((<COMMA>|{})identifier())+ | {}
 }
 
 //Tokenize identifier
-void identifier () : {}
+void identifier () #identifier: {}
 {
-    <IDENTIFIER>{System.out.println("Identifier");}
+    <IDENTIFIER>{}
 }
 
 //Tokenize structure of a type
-void type () : {}
+void type () #type: {}
 {
-    <INT> {System.out.println("Integer Type");}
-    |<BOOL> {System.out.println("Boolean Type");}
-    |<VOID> {System.out.println("Void Type");}
+    <INT> {}
+    |<BOOL> {}
+    |<VOID> {}
 }
 
 //Boolean operations
-void boolOp() : {}
+void boolOp() #booleanoperator: {}
 {
-    <TRUE>{System.out.println("True");}
-    |<FALSE>{System.out.println("False");}
+    <TRUE>{}
+    |<FALSE>{}
 }
 
 //Binary operations
-void binOp() : {}
+void binOp() #binaryoperator: {}
 {
-    <PLUS> {System.out.println("Plus operator");}
-    |<MINUS> {System.out.println("Minus operator");}
+    <PLUS> {}
+    |<MINUS> {}
 }
