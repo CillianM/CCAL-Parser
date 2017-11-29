@@ -44,8 +44,10 @@ public class CCALParser {
             return ;
           }
           try {
-            SimpleNode root = parser.Programme();
-            root.dump("");
+            ASTprogramme root = parser.Programme();
+            //root.dump("");
+            Visitor v = new Visitor();
+            System.out.println(root.jjtAccept(v,null));
             System.out.println ("CCALParser: The input was read successfully.");
 
           }
@@ -139,7 +141,7 @@ TOKEN :
 
 //Start the parsing here
 //Break down the programme into a list of declarations,functions and it's main method
-SimpleNode Programme () #programme: {}
+ASTprogramme Programme () #programme: {}
 {
     declarationList(){}
     functionList(){}
@@ -148,7 +150,7 @@ SimpleNode Programme () #programme: {}
 }
 
 //Take the structure of a main method and make sub calls to the inner structures
-void mainMethod () #main: {}
+void mainMethod () : {}
 {
     <MAIN> {}
     <BEGIN> {}
@@ -158,15 +160,17 @@ void mainMethod () #main: {}
 }
 
 //Made up of zero or more functions
-void functionList () #funtionList: {}
+void functionList (): {}
 {
     (function())*
 }
 
 //Function broken down into tokens
-void function () #function: {}
+void function (): {
+int paramCount = 0;
+}
 {
-    type() identifier()<OPBRA>paramList()<CLBRA><IS> {}
+    type() identifier()<OPBRA>{paramCount = paramList();}<CLBRA><IS> { jjtThis.data.put("paramCount",Integer.toString(paramCount)); } #FunctionHeader
     declarationList() {}
     <BEGIN> {}
     statementBlock() {}
@@ -175,29 +179,31 @@ void function () #function: {}
 }
 
 //Can be a list of parameters or nothing at all
-void paramList () #paramlist: {}
+int paramList (): {
+int paramCount = 0;
+}
 {
-    ((<COMMA>|{})identifier()<COLON>type())+ | {}
+    (((<COMMA>|{})identifier()<COLON>type(){paramCount++;})+ | {}){return paramCount;}
 }
 
 //A statement block can have zero or more statements
-void statementBlock () #statementblock: {}
+void statementBlock () : {}
 {
     (statement())*{}
 }
 
 //Break statement structure down into tokesn
-void statement () #statement: {}
+void statement (): {}
 {
     //Take multiple options for a statement into account in one line
-    identifier()(<ASIGN>expression()| <OPBRA>argList()<CLBRA>)<SCOLON>
+    identifier()(<ASIGN>expression() #StatementAssignment| <OPBRA>argList()<CLBRA>)<SCOLON>
     | (<IF> | <WHILE>) conditionInteraction() <BEGIN> statementBlock() <END>
     | (<ELSE> | {}) <BEGIN> statementBlock() <END>
     | <SKI><SCOLON>
 }
 
 //Tokenize structure of condition and return back the amount of brackets used
-int condition (int bracketCount) #condition: {}
+int condition (int bracketCount) : {}
 {
     (<OPBRA> {bracketCount++; } | {})
     expression()comparisionOp()expression()
@@ -206,7 +212,7 @@ int condition (int bracketCount) #condition: {}
 }
 
 //Tokenize one or more conditions while keeping trakc of any brackets/nested brackets 
-void conditionInteraction () #conditioninteraction: {
+void conditionInteraction () : {
 int bracketCount = 0;
 }
 {
@@ -216,7 +222,7 @@ int bracketCount = 0;
 }
 
 //Comparison operators
-void comparisionOp () #comparisonoperator: {}
+void comparisionOp () : {}
 {
     <EQ> {}
     | <NOTEQ> {}
@@ -227,13 +233,13 @@ void comparisionOp () #comparisonoperator: {}
 }
 
 //Zero or more declarations
-void declarationList () #declarationlist: {}
+void declarationList () : {}
 {
     (declaration()<SCOLON>)*
 }
 
 //A declaration can be a variable declaration or a constant decalration
-void declaration () #declaration: {}
+void declaration () : {}
 {
     varDeclaration()|constDeclaration() {}
 }
@@ -247,11 +253,11 @@ void constDeclaration () #constdeclaration: {}
 //Tokenize variable decalration
 void varDeclaration () #vardeclaration: {}
 {
-    <VAR><IDENTIFIER><COLON>type() {}
+    <VAR>identifier()<COLON>type() {}
 }
 
 //Tokenize structure of expression
-void expression () #expression: {}
+void expression () : {}
 {
     //Moved some of the structure of a fragment into the expression
     /*
@@ -267,43 +273,43 @@ void expression () #expression: {}
 }
 
 //Tokenize the remaining structures of a fragment
-void fragment () #fragment: {}
+void fragment () #VariableValue: {}
 {
-    <MINUS>(identifier()|<DIGIT>){}
-    | <DIGIT>{}
-    | boolOp(){}
+    <MINUS>(identifier()|<DIGIT>){ jjtThis.data.put("value",token.image); jjtThis.data.put("type","integer");}
+    | <DIGIT>{ jjtThis.data.put("value",token.image); jjtThis.data.put("type","integer");}
+    | boolOp(){ jjtThis.data.put("value",token.image); jjtThis.data.put("type","boolean"); }
 
 }
 
 //Can be a list of arguments or nothing
-void argList () #argumentlist: {}
+void argList () : {}
 {
     ((<COMMA>|{})identifier())+ | {}
 }
 
 //Tokenize identifier
-void identifier () #identifier: {}
+void identifier () : {}
 {
-    <IDENTIFIER>{}
+    <IDENTIFIER>{ jjtThis.data.put("name",token.image); }#Variable
 }
 
 //Tokenize structure of a type
-void type () #type: {}
+void type () #TypeValue: {}
 {
-    <INT> {}
-    |<BOOL> {}
-    |<VOID> {}
+    <INT> { jjtThis.data.put("type",token.image); }
+    |<BOOL> { jjtThis.data.put("type",token.image); }
+    |<VOID> { jjtThis.data.put("type",token.image); }
 }
 
 //Boolean operations
-void boolOp() #booleanoperator: {}
+void boolOp() : {}
 {
     <TRUE>{}
     |<FALSE>{}
 }
 
 //Binary operations
-void binOp() #binaryoperator: {}
+void binOp() : {}
 {
     <PLUS> {}
     |<MINUS> {}

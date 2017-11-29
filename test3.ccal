@@ -1,5 +1,6 @@
 var i:integer;
-integer test_fn (x:integer) is
+const five : integer = 5;
+integer test_fn (x:integer,y:integer) is
   var i:integer;
 begin
   i = 2;

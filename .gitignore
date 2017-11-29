@@ -4,6 +4,8 @@
 # Java Files
 *.java
 !BaseNode.java
+!Visitor.java
+!Symbol.java
 
 # JJ Files
 *.jj
