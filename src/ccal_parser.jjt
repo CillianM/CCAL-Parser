@@ -3,10 +3,9 @@ Here are the options for the programme as a whole. All we need is to ignore case
 */
 options {
    IGNORE_CASE = true;
-   MULTI=true;
-   VISITOR=true;
-   NODE_DEFAULT_VOID=true;
-   NODE_EXTENDS="BaseNode";
+   MULTI = true;
+   VISITOR = true;
+   NODE_DEFAULT_VOID = true;
  }
 
 /*
@@ -15,7 +14,12 @@ options {
 */
 PARSER_BEGIN(CCALParser)
 
+import java.util.*;
+
 public class CCALParser {
+
+    public static Hashtable SymbolTable = new Hashtable();
+
 
     public static void main(String [] args){
 
@@ -44,10 +48,15 @@ public class CCALParser {
             return ;
           }
           try {
-            ASTprogramme root = parser.Programme();
-            //root.dump("");
+            SimpleNode root = parser.Programme();
+            System.out.println("**** Abstract Syntax Tree ****");
+            root.dump("");
+            System.out.println("******************************");
+
+            System.out.println();
+
             Visitor v = new Visitor();
-            System.out.println(root.jjtAccept(v,null));
+            root.jjtAccept(v, null);
             System.out.println ("CCALParser: The input was read successfully.");
 
           }
@@ -141,7 +150,7 @@ TOKEN :
 
 //Start the parsing here
 //Break down the programme into a list of declarations,functions and it's main method
-ASTprogramme Programme () #programme: {}
+SimpleNode Programme () #Programme: {}
 {
     declarationList(){}
     functionList(){}
@@ -150,7 +159,7 @@ ASTprogramme Programme () #programme: {}
 }
 
 //Take the structure of a main method and make sub calls to the inner structures
-void mainMethod () : {}
+void mainMethod () #Main: {}
 {
     <MAIN> {}
     <BEGIN> {}
@@ -160,34 +169,42 @@ void mainMethod () : {}
 }
 
 //Made up of zero or more functions
-void functionList (): {}
+void functionList () #FunctionList: {}
 {
     (function())*
 }
 
 //Function broken down into tokens
-void function (): {
-int paramCount = 0;
-}
+
+void functionBody() #FunctionBody(3): {}
 {
-    type() identifier()<OPBRA>{paramCount = paramList();}<CLBRA><IS> { jjtThis.data.put("paramCount",Integer.toString(paramCount)); } #FunctionHeader
+    <IS>
     declarationList() {}
     <BEGIN> {}
     statementBlock() {}
-    <RET><OPBRA>(expression() | {})<CLBRA><SCOLON> {}
-    <END>{}
+    returnStatement()
+    <END>
+}
+
+void function () #Function: {}
+{
+    type() identifier()<OPBRA>paramList()<CLBRA>
+    functionBody()
+}
+
+void returnStatement () #ReturnStatement: {}
+{
+    <RET> expression() <SCOLON>
 }
 
 //Can be a list of parameters or nothing at all
-int paramList (): {
-int paramCount = 0;
-}
+void paramList () #ParamList: {}
 {
-    (((<COMMA>|{})identifier()<COLON>type(){paramCount++;})+ | {}){return paramCount;}
+    ( identifier() <COLON> type() #Param(2) ( <COMMA> identifier() <COLON> type() #Param(2) )* | {} )
 }
 
 //A statement block can have zero or more statements
-void statementBlock () : {}
+void statementBlock () #StatementBlock: {}
 {
     (statement())*{}
 }
@@ -196,44 +213,30 @@ void statementBlock () : {}
 void statement (): {}
 {
     //Take multiple options for a statement into account in one line
-    identifier()(<ASIGN>expression() #StatementAssignment| <OPBRA>argList()<CLBRA>)<SCOLON>
-    | (<IF> | <WHILE>) conditionInteraction() <BEGIN> statementBlock() <END>
-    | (<ELSE> | {}) <BEGIN> statementBlock() <END>
-    | <SKI><SCOLON>
+     ( LOOKAHEAD(2)
+           assignment() <SCOLON> |
+           functionCall() <SCOLON> |
+           <OPBRA> statementBlock() <CLBRA> |
+           <IF> condition() #Condition
+             statement()
+             <ELSE>
+             statement() #If(3)|
+           <WHILE> condition() #Condition
+             <OPBRA> statementBlock() <CLBRA> #While(2) |
+           <SKI> <SCOLON> #Skip)
 }
 
 //Tokenize structure of condition and return back the amount of brackets used
-int condition (int bracketCount) : {}
+void condition ( ) : {}
 {
-    (<OPBRA> {bracketCount++; } | {})
-    expression()comparisionOp()expression()
-    (<CLBRA>{bracketCount--; } | {})
-    {return bracketCount;}
-}
-
-//Tokenize one or more conditions while keeping trakc of any brackets/nested brackets 
-void conditionInteraction () : {
-int bracketCount = 0;
-}
-{
-
-    (<TILDA> | {}){bracketCount = condition(bracketCount); System.out.println("Bracket Count = " + bracketCount);}
-    ((<OR> | <AND>){bracketCount = condition(bracketCount); System.out.println("Bracket Count = " + bracketCount);})*{if(bracketCount != 0) throw new ParseException("Brackets not closed correctly");}
-}
-
-//Comparison operators
-void comparisionOp () : {}
-{
-    <EQ> {}
-    | <NOTEQ> {}
-    | <LT> {}
-    | <LTEQ> {}
-    | <GT> {}
-    | <GTEQ> {}
+    ( LOOKAHEAD(2)
+      <OPBRA> condition() <CLBRA> comparisionOp() |
+      <TILDA> condition() #Not(1) |
+      expression() comparisionOp() )
 }
 
 //Zero or more declarations
-void declarationList () : {}
+void declarationList () #DeclarationList: {}
 {
     (declaration()<SCOLON>)*
 }
@@ -245,13 +248,13 @@ void declaration () : {}
 }
 
 //Tokenize constant decalration
-void constDeclaration () #constdeclaration: {}
+void constDeclaration () #ConstDeclaration: {}
 {
     <CONST>identifier()<COLON>type()<ASIGN>expression() {}
 }
 
 //Tokenize variable decalration
-void varDeclaration () #vardeclaration: {}
+void varDeclaration () #VarDeclaration: {}
 {
     <VAR>identifier()<COLON>type() {}
 }
@@ -265,52 +268,82 @@ void expression () : {}
     by removing it from a fragment we remove the need for a lookahead to see which tokens we should be 
     reading in after
     */
-    fragment()(binOp()fragment() | {}) //still keeping posibility of negative identifier from fragment
-    |identifier()(<OPBRA>argList()<CLBRA>|binOp()(identifier()|fragment())|{}) //positive identifier from fragment integrated here
-    |<OPBRA>expression()<CLBRA>
+    ( LOOKAHEAD(2)
+          functionCall() |
+          fragment() binOp() )
 
     {}
+}
+
+void functionCall() #FunctionCall:{}
+{
+   identifier() <OPBRA> ( argList() )* <CLBRA>
 }
 
 //Tokenize the remaining structures of a fragment
 void fragment () #VariableValue: {}
 {
-    <MINUS>(identifier()|<DIGIT>){ jjtThis.data.put("value",token.image); jjtThis.data.put("type","integer");}
-    | <DIGIT>{ jjtThis.data.put("value",token.image); jjtThis.data.put("type","integer");}
-    | boolOp(){ jjtThis.data.put("value",token.image); jjtThis.data.put("type","boolean"); }
+    ( identifier() |
+      digit() |
+      boolOp() |
+      <PLUS> fragment() #Pos |
+      <MINUS> fragment() #Minus |
+      <OPBRA> expression() <CLBRA> |
+      {} )
 
 }
 
 //Can be a list of arguments or nothing
-void argList () : {}
+void argList () #ArgumentList: {}
 {
-    ((<COMMA>|{})identifier())+ | {}
+    identifier() #Arg(1) ( <COMMA> identifier() #Arg(1) )*
 }
 
 //Tokenize identifier
-void identifier () : {}
+void identifier ( ) #Variable: { Token t; }
 {
-    <IDENTIFIER>{ jjtThis.data.put("name",token.image); }#Variable
+    t = <IDENTIFIER> { jjtThis.value = t; }
 }
 
-//Tokenize structure of a type
-void type () #TypeValue: {}
+void digit () #Digit: { Token t; }
 {
-    <INT> { jjtThis.data.put("type",token.image); }
-    |<BOOL> { jjtThis.data.put("type",token.image); }
-    |<VOID> { jjtThis.data.put("type",token.image); }
+    t = <DIGIT> { jjtThis.value = t; }
 }
 
-//Boolean operations
-void boolOp() : {}
+void type ( ) #TypeValue: { Token t; }
 {
-    <TRUE>{}
-    |<FALSE>{}
+    ( t = <INT> { jjtThis.value = t; } |
+      t = <BOOL> { jjtThis.value = t; } |
+      t = <VOID> { jjtThis.value = t; } )
 }
 
-//Binary operations
-void binOp() : {}
+//Comparison operators
+void comparisionOp () : {}
 {
-    <PLUS> {}
-    |<MINUS> {}
+    <EQ> #Equal(2)
+    | <NOTEQ> #NotEqual(2)
+    | <LT> #LessThan(2)
+    | <LTEQ> #LessThanEqual(2)
+    | <GT> #GreaterThan(2)
+    | <GTEQ> #GreaterThanEqual(2)
+    |<OR> condition() #Or(2) |
+          <AND> condition() #And(2) | {}
+}
+
+void boolOp ( ) #Boolean: { Token t; }
+{
+    t = <TRUE> { jjtThis.value = t; } |
+    t = <FALSE> { jjtThis.value = t; }
+}
+
+void binOp ( ) : {}
+{
+    ( <PLUS> expression() #Add(2) |
+      <MINUS> expression() #Subtract(2) |
+      {} )
+}
+
+void assignment () #Assignment: {}
+{
+    identifier() <ASIGN> expression()
 }
