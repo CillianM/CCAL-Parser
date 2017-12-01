@@ -6,44 +6,12 @@ public class Symbol extends Object{
     private DataType dataType;
     private String scope;
     private LinkedHashMap<String, Object> values;
-    private int numArgs = -1; // used when dataType is DataType.Function
-    private boolean isRead = false; // should always be false when initialised
-    private boolean isCalled = false; // should always be false when initialised
+    private int numArgs = -1;
+    private boolean isRead = false;
+    private boolean isCalled = false;
 
-    public Symbol(Token n0, Token t0, String s0, DataType d0) {
-        name = n0;
-        type = t0;
-        scope = s0;
-        dataType = d0;
-        values = new LinkedHashMap<String, Object>();
-        // numArgs will be left as -1
-    }
-
-    public Symbol(Token n0, Token t0, String s0, DataType d0, int na0) {
-        name = n0;
-        type = t0;
-        scope = s0;
-        dataType = d0;
-        values = new LinkedHashMap<String, Object>();
-        numArgs = na0;
-    }
-
-    public Symbol(Token n0, Token t0, DataType d0) {
-        name = n0;
-        type = t0;
-        // scope will be left undefined
-        dataType = d0;
-        values = new LinkedHashMap<String, Object>();
-        // numArgs will be left as -1
-    }
-
-    public Symbol(Token n0, Token t0, DataType d0, int na0) {
-        name = n0;
-        type = t0;
-        // scope will be left undefined
-        dataType = d0;
-        values = new LinkedHashMap<String, Object>();
-        numArgs = na0;
+    public Symbol() {
+        values = new LinkedHashMap<>();
     }
 
     // Getter and Setters
@@ -125,6 +93,7 @@ public class Symbol extends Object{
         return "[" + name + ", " + type + ", " + dataType + ", " + scope
                 + ", " + values + ", " + numArgs + ", " + isRead + "]";
     }
+
 
 
 }

@@ -9,6 +9,15 @@ end
 
 main
 begin
+  var isTrue:boolean;
+  if ( i < five )
+  begin
+    isTrue = true;
+  end
+  else
+  begin
+    isTrue = false;
+  end
   i = 1;
   i = test_fn (i);
 end

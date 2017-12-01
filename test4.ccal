@@ -1,3 +1,5 @@
+var i:integer;
+const five : integer = 5;
 integer multiply (x:integer, y:integer) is
   var result:integer;
   var minus_sign : boolean;

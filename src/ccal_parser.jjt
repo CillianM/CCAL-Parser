@@ -152,20 +152,17 @@ TOKEN :
 //Break down the programme into a list of declarations,functions and it's main method
 SimpleNode Programme () #Programme: {}
 {
-    declarationList(){}
-    functionList(){}
-    mainMethod(){}
-    {return jjtThis;}
+    declarationList()functionList()mainMethod(){return jjtThis;}
 }
 
 //Take the structure of a main method and make sub calls to the inner structures
 void mainMethod () #Main: {}
 {
-    <MAIN> {}
-    <BEGIN> {}
-    declarationList() {}
-    statementBlock() {}
-    <END> {}
+    <MAIN>
+    <BEGIN>
+    declarationList()
+    statementBlock()
+    <END>
 }
 
 //Made up of zero or more functions
@@ -174,22 +171,20 @@ void functionList () #FunctionList: {}
     (function())*
 }
 
-//Function broken down into tokens
-
-void functionBody() #FunctionBody(3): {}
-{
-    <IS>
-    declarationList() {}
-    <BEGIN> {}
-    statementBlock() {}
-    returnStatement()
-    <END>
-}
-
 void function () #Function: {}
 {
     type() identifier()<OPBRA>paramList()<CLBRA>
     functionBody()
+}
+
+void functionBody() #FunctionBody(3): {}
+{
+    <IS>
+    declarationList()
+    <BEGIN>
+    statementBlock()
+    returnStatement()
+    <END>
 }
 
 void returnStatement () #ReturnStatement: {}
@@ -201,38 +196,6 @@ void returnStatement () #ReturnStatement: {}
 void paramList () #ParamList: {}
 {
     ( identifier() <COLON> type() #Param(2) ( <COMMA> identifier() <COLON> type() #Param(2) )* | {} )
-}
-
-//A statement block can have zero or more statements
-void statementBlock () #StatementBlock: {}
-{
-    (statement())*{}
-}
-
-//Break statement structure down into tokesn
-void statement (): {}
-{
-    //Take multiple options for a statement into account in one line
-     ( LOOKAHEAD(2)
-           assignment() <SCOLON> |
-           functionCall() <SCOLON> |
-           <OPBRA> statementBlock() <CLBRA> |
-           <IF> condition() #Condition
-             statement()
-             <ELSE>
-             statement() #If(3)|
-           <WHILE> condition() #Condition
-             <OPBRA> statementBlock() <CLBRA> #While(2) |
-           <SKI> <SCOLON> #Skip)
-}
-
-//Tokenize structure of condition and return back the amount of brackets used
-void condition ( ) : {}
-{
-    ( LOOKAHEAD(2)
-      <OPBRA> condition() <CLBRA> comparisionOp() |
-      <TILDA> condition() #Not(1) |
-      expression() comparisionOp() )
 }
 
 //Zero or more declarations
@@ -259,38 +222,51 @@ void varDeclaration () #VarDeclaration: {}
     <VAR>identifier()<COLON>type() {}
 }
 
+//A statement block can have zero or more statements
+void statementBlock () #StatementBlock: {}
+{
+    (statement())*
+}
+
+//Break statement structure down into tokesn
+void statement (): {}
+{
+      identifier()<ASIGN>(LOOKAHEAD(3) expression()#Assignment|functionCall())<SCOLON>
+     | <BEGIN> statementBlock() <END>
+     | <IF> condition() #Condition <BEGIN> statement() <END>
+       <ELSE> <BEGIN> statement() #If(3) <END>
+     | <WHILE> condition() #Condition <BEGIN> statementBlock() <END> #While(2)
+     | <SKI><SCOLON> #Skip
+}
+
+//Tokenize structure of condition and return back the amount of brackets used
+void condition ( ) : {}
+{
+      (LOOKAHEAD(2)<OPBRA> condition() <CLBRA> |
+      <TILDA> condition() #Not(1) |
+      expression() comparisionOp() expression())
+}
+
 //Tokenize structure of expression
 void expression () : {}
 {
-    //Moved some of the structure of a fragment into the expression
-    /*
-    As an identifier is part of a fragment and expression there is no need to have it in both,
-    by removing it from a fragment we remove the need for a lookahead to see which tokens we should be 
-    reading in after
-    */
-    ( LOOKAHEAD(2)
-          functionCall() |
-          fragment() binOp() )
-
-    {}
+    fragment() binOp()
+  | <OPBRA> expression() <CLBRA>
 }
 
 void functionCall() #FunctionCall:{}
 {
-   identifier() <OPBRA> ( argList() )* <CLBRA>
+   <OPBRA>(argList())*<CLBRA>
 }
 
 //Tokenize the remaining structures of a fragment
 void fragment () #VariableValue: {}
 {
-    ( identifier() |
-      digit() |
-      boolOp() |
-      <PLUS> fragment() #Pos |
-      <MINUS> fragment() #Minus |
-      <OPBRA> expression() <CLBRA> |
-      {} )
-
+        (identifier()(functionCall()|{}))
+      | digit()
+      | boolOp()
+      | <PLUS> identifier() #Pos
+      | <MINUS> identifier() #Minus
 }
 
 //Can be a list of arguments or nothing
