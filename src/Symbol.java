@@ -1,6 +1,6 @@
 import java.util.LinkedHashMap;
 
-public class Symbol extends Object{
+class Symbol {
     private Token name;
     private Token type;
     private DataType dataType;
@@ -10,85 +10,86 @@ public class Symbol extends Object{
     private boolean isRead = false;
     private boolean isCalled = false;
 
-    public Symbol() {
+    Symbol() {
         values = new LinkedHashMap<>();
     }
 
     // Getter and Setters
-    public void setName(Token n0) {
+    void setName(Token n0) {
         name = n0;
     }
 
-    public Token getName() {
+    Token getName() {
         return name;
     }
 
-    public void setType(Token t0) {
+    void setType(Token t0) {
         type = t0;
     }
 
-    public Token getType() {
+    Token getType() {
         return type;
     }
 
-    public void setDataType(DataType d0) {
+    void setDataType(DataType d0) {
         dataType = d0;
     }
 
-    public DataType getDataType() {
+    DataType getDataType() {
         return dataType;
     }
 
-    public void setScope(String s0) {
+    void setScope(String s0) {
         scope = s0;
     }
 
-    public String getScope() {
+    String getScope() {
         return scope;
     }
 
-    public void setValues(LinkedHashMap<String, Object> v0) {
+    void setValues(LinkedHashMap<String, Object> v0) {
         values = v0;
     }
 
-    public LinkedHashMap<String, Object> getValues() {
+    LinkedHashMap<String, Object> getValues() {
         return values;
     }
 
-    public void setNumArgs(int na0) {
+    void setNumArgs(int na0) {
         numArgs = na0;
     }
 
-    public int getNumArgs() {
+    int getNumArgs() {
         return numArgs;
     }
 
-    public void setIsRead(boolean i0) {
+    void setIsRead(boolean i0) {
         isRead = i0;
     }
 
-    public boolean getIsRead() {
+    boolean getIsRead() {
         return isRead;
     }
 
-    public void setIsCalled(boolean i0) {
+    void setIsCalled(boolean i0) {
         isCalled = i0;
     }
 
-    public boolean getIsCalled() {
+    boolean getIsCalled() {
         return isCalled;
     }
 
     // get the value of the token by its name
-    public Object getValue(String name) {
+    Object getValue(String name) {
         return values.get(name);
     }
 
     // add a value of a token by its name
-    public void addValue(String name, Object value) {
+    void addValue(String name, Object value) {
         values.put(name, value);
     }
 
+    @Override
     public String toString() {
         return "[" + name + ", " + type + ", " + dataType + ", " + scope
                 + ", " + values + ", " + numArgs + ", " + isRead + "]";

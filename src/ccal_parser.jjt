@@ -231,12 +231,17 @@ void statementBlock () #StatementBlock: {}
 //Break statement structure down into tokesn
 void statement (): {}
 {
-      identifier()<ASIGN>(LOOKAHEAD(3) expression()#Assignment|functionCall())<SCOLON>
-     | <BEGIN> statementBlock() <END>
-     | <IF> condition() #Condition <BEGIN> statement() <END>
-       <ELSE> <BEGIN> statement() #If(3) <END>
-     | <WHILE> condition() #Condition <BEGIN> statementBlock() <END> #While(2)
-     | <SKI><SCOLON> #Skip
+     ( LOOKAHEAD(2)
+           assignment() <SCOLON> |
+           functionCall() <SCOLON> |
+           <BEGIN> statementBlock() <END> |
+           <IF> condition() #Condition <BEGIN>
+             statement()
+             <ELSE> <BEGIN>
+             statement() <END> #If(3)|
+           <WHILE> condition() #Condition
+             <BEGIN> statementBlock() <END> #While(2) |
+           <SKI> <SCOLON> #Skip)
 }
 
 //Tokenize structure of condition and return back the amount of brackets used
@@ -250,23 +255,26 @@ void condition ( ) : {}
 //Tokenize structure of expression
 void expression () : {}
 {
-    fragment() binOp()
-  | <OPBRA> expression() <CLBRA>
+  ( LOOKAHEAD(2)
+        functionCall() |
+        fragment() binOp() )
 }
 
 void functionCall() #FunctionCall:{}
 {
-   <OPBRA>(argList())*<CLBRA>
+  identifier()<OPBRA>(argList())*<CLBRA>
 }
 
 //Tokenize the remaining structures of a fragment
-void fragment () #VariableValue: {}
+void fragment (): {}
 {
-        (identifier()(functionCall()|{}))
+        identifier()
       | digit()
       | boolOp()
-      | <PLUS> identifier() #Pos
-      | <MINUS> identifier() #Minus
+      | <PLUS> fragment() #Pos
+      | <MINUS> fragment() #Minus
+      | <OPBRA> expression() <CLBRA>
+      | {}
 }
 
 //Can be a list of arguments or nothing

@@ -289,7 +289,7 @@ public class Visitor implements CCALParserVisitor {
 
             // add the const value to the map of values
             // since its a const this value should not ever change
-            Token value = (Token) node.jjtGetChild(2).jjtGetChild(0).jjtAccept(this, null);
+            Token value = (Token) node.jjtGetChild(2).jjtAccept(this, null);
             if(type.image.equals("integer") && !isInt(value.image)) {
                 System.out.println("Cannot assign boolean \"" + value.image + "\" to constant \"" + id.image + "\"");
                 System.out.println("Error at line " + id.beginLine + ", column " + id.beginColumn);
@@ -357,7 +357,7 @@ public class Visitor implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTFunctionCall node, Object data) {
-        Token id = (Token) node.jjtGetParent().jjtGetChild(0).jjtAccept(this, null);
+        Token id = (Token) node.jjtGetChild(0).jjtAccept(this, null);
         String foundIn = currentScope;
 
         // check if function(id) has been declared
@@ -386,13 +386,6 @@ public class Visitor implements CCALParserVisitor {
 
         }
 
-        return null;
-    }
-
-
-    @Override
-    public Object visit(ASTVariableValue node, Object data) {
-        node.childrenAccept(this, data);
         return null;
     }
 
@@ -484,7 +477,7 @@ public class Visitor implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTArgumentList node, Object data) {
-        Token funcId = (Token) node.jjtGetParent().jjtGetParent().jjtGetChild(0).jjtAccept(this, null);
+        Token funcId = (Token) node.jjtGetParent().jjtGetChild(0).jjtAccept(this, null);
 
         HashMap<String, Symbol> mapTemp = symbolTable.get("Program");
         if(mapTemp != null) {
@@ -515,6 +508,11 @@ public class Visitor implements CCALParserVisitor {
                             // error
                             // argument in function call is incorrect type
                             errorList.add(new ErrorMessage(argi.beginLine,argi.beginColumn,"\"" + argi.image + "\" in function call for \"" + funcId.image + "\" is of incorrect type"));
+                        }
+                        //if argument is variable then it is accessed
+                        if(argiStc.getDataType() != DataType.Unknown) {
+                            argiStc.setIsRead(true);
+                            updateScope(argi.image,argiStc);
                         }
                         i++;
                     }
@@ -839,7 +837,7 @@ public class Visitor implements CCALParserVisitor {
             mapTemp = new HashMap<String, Symbol>();
         }
 
-        Token id = (Token) node.jjtGetParent().jjtGetChild(0).jjtAccept(this, null);
+        Token id = (Token) node.jjtGetChild(0).jjtAccept(this, null);
 
         // get stc from being declared in this currentScope
         Symbol idStc = mapTemp.get(id.image);
@@ -849,8 +847,8 @@ public class Visitor implements CCALParserVisitor {
         }
 
         if(idStc != null) {
-            Token value = (Token) node.jjtGetChild(0).jjtGetChild(0).jjtAccept(this, null);
-            Node valueNode = node.jjtGetChild(0).jjtGetChild(0);
+            Token value = (Token) node.jjtGetChild(1).jjtAccept(this, null);
+            Node valueNode = node.jjtGetChild(1);
 
             if(valueNode instanceof ASTVariable) {
                 Symbol valueStc = symbolTable.get(currentScope).get(value.image);
@@ -867,13 +865,26 @@ public class Visitor implements CCALParserVisitor {
                     errorList.add(new ErrorMessage(id.beginLine,id.beginColumn,"\"" + id.image + "\" and \"" + value.image + "\" are not of same type"));
                 } else if(idStc.getValues().size() == 0) {
                     // if its initial value has already been stored, leave it
+                    idStc.setIsRead(true);
                     idStc.addValue(id.image, value);
                     mapTemp.put(id.image, idStc);
                     symbolTable.put(currentScope, mapTemp);
+
+                    valueStc.setIsRead(true);
+                    updateScope(value.image,valueStc);
                 } else {
                     valueStc.setIsRead(true);
-                    mapTemp.put(value.image, valueStc);
-                    symbolTable.put(currentScope, mapTemp);
+                    valueStc.setIsCalled(true);
+                    if(valueStc.getScope().equals(currentScope)){
+                        mapTemp.put(value.image, valueStc);
+                        symbolTable.put(currentScope, mapTemp);
+                    }
+                    else
+                    {
+                        HashMap<String, Symbol> outerScope = symbolTable.get(valueStc.getScope());
+                        outerScope.put(value.image, valueStc);
+                        symbolTable.put(valueStc.getScope(), outerScope);
+                    }
                 }
             } else if(valueNode instanceof ASTDigit) {
                 if(!idStc.getType().image.equals("integer")) {
@@ -883,8 +894,8 @@ public class Visitor implements CCALParserVisitor {
                 } else if(idStc.getValues().size() == 0) {
                     // if its initial value has already been stored, leave it
                     idStc.addValue(id.image, value);
-                    mapTemp.put(id.image, idStc);
-                    symbolTable.put(currentScope, mapTemp);
+                    idStc.setIsCalled(true);
+                    updateScope(id.image,idStc);
                 }
             } else if(valueNode instanceof ASTBoolean) {
                 if(!idStc.getType().image.equals("boolean")) {
@@ -898,8 +909,8 @@ public class Visitor implements CCALParserVisitor {
                     symbolTable.put(currentScope, mapTemp);
                 }
             } else if(valueNode instanceof ASTFunctionCall ||
-                    valueNode instanceof ASTPositive ||
-                    valueNode instanceof ASTNegative) {
+                    valueNode instanceof ASTPos ||
+                    valueNode instanceof ASTMinus) {
                 Token subChild = (Token) valueNode.jjtGetChild(0).jjtAccept(this, null);
                 if(idStc.getValues().size() == 0) {
                     // if its initial value has already been stored, leave it
@@ -931,6 +942,18 @@ public class Visitor implements CCALParserVisitor {
 
 
         return null;
+    }
+
+    private void updateScope(String image,Symbol symbol){
+        HashMap<String,Symbol> tempMap = new HashMap<>();
+        if (symbol.getScope().equals(currentScope)) {
+            tempMap.put(image, symbol);
+            symbolTable.put(currentScope, tempMap);
+        } else {
+            tempMap = symbolTable.get(symbol.getScope());
+            tempMap.put(image, symbol);
+            symbolTable.put(symbol.getScope(), tempMap);
+        }
     }
 
     private void isSematicError(){
