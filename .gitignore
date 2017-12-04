@@ -6,6 +6,7 @@
 !BaseNode.java
 !Visitor.java
 !Symbol.java
+!DataType.java
 
 # JJ Files
 *.jj
