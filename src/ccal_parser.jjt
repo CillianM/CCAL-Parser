@@ -232,24 +232,21 @@ void statementBlock () #StatementBlock: {}
 void statement (): {}
 {
      ( LOOKAHEAD(2)
-           assignment() <SCOLON> |
-           functionCall() <SCOLON> |
-           <BEGIN> statementBlock() <END> |
-           <IF> condition() #Condition <BEGIN>
-             statement()
-             <ELSE> <BEGIN>
-             statement() <END> #If(3)|
-           <WHILE> condition() #Condition
-             <BEGIN> statementBlock() <END> #While(2) |
-           <SKI> <SCOLON> #Skip)
+       assignment() <SCOLON>
+       | functionCall() <SCOLON>
+       | <BEGIN> statementBlock() <END>
+       | <IF> condition() #Condition <BEGIN> statementBlock()<END>
+         <ELSE> <BEGIN> statementBlock() <END> #If(3)
+       | <WHILE> condition() #Condition <BEGIN> statementBlock() <END> #While(2)
+       | <SKI> <SCOLON> #Skip)
 }
 
 //Tokenize structure of condition and return back the amount of brackets used
-void condition ( ) : {}
-{
-      (LOOKAHEAD(2)<OPBRA> condition() <CLBRA> |
-      <TILDA> condition() #Not(1) |
-      expression() comparisionOp() expression())
+void condition ( ) : {}{
+      ( LOOKAHEAD(2)
+            <OPBRA> condition() <CLBRA> comparisionOp() |
+            <TILDA> condition() #Not(1) |
+            expression() comparisionOp() )
 }
 
 //Tokenize structure of expression
@@ -304,12 +301,12 @@ void type ( ) #TypeValue: { Token t; }
 //Comparison operators
 void comparisionOp () : {}
 {
-    <EQ> #Equal(2)
-    | <NOTEQ> #NotEqual(2)
-    | <LT> #LessThan(2)
-    | <LTEQ> #LessThanEqual(2)
-    | <GT> #GreaterThan(2)
-    | <GTEQ> #GreaterThanEqual(2)
+    <EQ> condition() #Equal(2)
+    | <NOTEQ> condition() #NotEqual(2)
+    | <LT> condition() #LessThan(2)
+    | <LTEQ> condition() #LessThanEqual(2)
+    | <GT> condition() #GreaterThan(2)
+    | <GTEQ> condition() #GreaterThanEqual(2)
     |<OR> condition() #Or(2) |
           <AND> condition() #And(2) | {}
 }

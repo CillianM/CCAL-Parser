@@ -1,5 +1,6 @@
 var i:integer;
 const five : integer = 5;
+const test : boolean = true;
 integer test_fn (x:integer) is
   var i:integer;
 begin
@@ -10,7 +11,8 @@ end
 main
 begin
   var isTrue:boolean;
-  if ( i < five )
+  i = 1;
+  if ( five == i )
   begin
     isTrue = true;
   end
@@ -18,6 +20,5 @@ begin
   begin
     isTrue = false;
   end
-  i = 1;
   i = test_fn (i);
 end
