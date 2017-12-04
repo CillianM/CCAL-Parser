@@ -459,43 +459,6 @@ public class Visitor implements CCALParserVisitor {
     }
 
     @Override
-    public Object visit(ASTPos node, Object data) {
-        // check if id has been declared
-        Token id = (Token) node.jjtGetParent().jjtGetChild(0).jjtAccept(this, null);
-
-        String foundIn = currentScope;
-
-        HashMap<String, Symbol> mapTemp = symbolTable.get(currentScope);
-        Symbol idStc = mapTemp.get(id.image);
-        if (idStc == null) {
-            mapTemp = symbolTable.get("Program");
-            foundIn = "Program";
-            idStc = mapTemp.get(id.image);
-        }
-
-        if (idStc == null) {
-            // error if still not declared
-            errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Variable \"" + id.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Program\""));
-        } else if (idStc.getValues().size() == 0) {
-            if (currentScope.equals("Program") || currentScope.equals("Main")) {
-                // error if var has no value
-                errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Variable \"" + id.image + "\" has no value in currentScope \"" + currentScope + "\""));
-            }
-        } else if (!idStc.getType().image.equals("integer")) {
-            // var / const has been declared and has value
-            // error if var is of type boolean
-            errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Cannot create positive value from " + idStc.getDataType().toString().toLowerCase() + " \"" + id.image + "\". Not of type integer"));
-        } else {
-            // set isRead value
-            idStc.setIsRead(true);
-            mapTemp.put(id.image, idStc);
-            symbolTable.put(foundIn, mapTemp);
-        }
-
-        return null;
-    }
-
-    @Override
     public Object visit(ASTArgumentList node, Object data) {
         Token funcId = (Token) node.jjtGetParent().jjtGetChild(0).jjtAccept(this, null);
 
