@@ -49,9 +49,9 @@ public class CCALParser {
           }
           try {
             SimpleNode root = parser.Programme();
-            System.out.println("**** Abstract Syntax Tree ****");
+            System.out.println("---- Abstract Syntax Tree ----");
             root.dump("");
-            System.out.println("******************************");
+            System.out.println("---- End Syntax Tree ----");
 
             System.out.println();
 

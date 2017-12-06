@@ -1,11 +1,14 @@
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 class Symbol {
     private Token name;
     private Token type;
     private DataType dataType;
     private String scope;
-    private LinkedHashMap<String, Object> values;
+    private LinkedHashMap<String, LinkedList<Variable>> values;
     private int numArgs = -1;
     private boolean isRead = false;
     private boolean isCalled = false;
@@ -47,11 +50,11 @@ class Symbol {
         return scope;
     }
 
-    void setValues(LinkedHashMap<String, Object> v0) {
+    void setValues(LinkedHashMap<String, LinkedList<Variable>> v0) {
         values = v0;
     }
 
-    LinkedHashMap<String, Object> getValues() {
+    LinkedHashMap<String, LinkedList<Variable>> getValues() {
         return values;
     }
 
@@ -80,13 +83,36 @@ class Symbol {
     }
 
     // get the value of the token by its name
-    Object getValue(String name) {
+    LinkedList<Variable> getValue(String name) {
         return values.get(name);
     }
 
     // add a value of a token by its name
-    void addValue(String name, Object value) {
-        values.put(name, value);
+    void addValue(String name, Variable value) {
+        LinkedList<Variable> variables =  values.get(name);
+        if(variables == null){
+            variables = new LinkedList<>();
+        }
+        variables.add(value);
+        values.put(name, variables);
+    }
+
+    String getFirstValue(String name){
+        return values.get(name).getFirst().getValue();
+    }
+
+    String printValues(){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{");
+        for (Map.Entry<String, LinkedList<Variable>> entry : values.entrySet()) {
+            String key = entry.getKey();
+            for (Variable variable : entry.getValue()) {
+                stringBuilder.append(variable.getValue()).append(":").append(variable.getType()).append(",");
+            }
+        }
+        stringBuilder.deleteCharAt(stringBuilder.length()-1);
+        stringBuilder.append("}");
+        return stringBuilder.toString();
     }
 
     @Override

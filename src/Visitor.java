@@ -42,18 +42,22 @@ public class Visitor implements CCALParserVisitor {
                 System.out.println(" DataType: " + currentSymbol.getDataType());
                 System.out.println(" Type: " + currentSymbol.getType());
                 if (currentSymbol.getDataType() == DataType.Function) {
-                    System.out.println(" Parameters: " + currentSymbol.getValues());
+                    System.out.println(" Parameters: " + currentSymbol.printValues());
                     System.out.println(" Is called?: " + currentSymbol.getIsCalled());
                     if (!currentSymbol.getIsCalled()) {
                         functionsNotCalled++;
                     }
                 } else {
-                    System.out.println(" Initial Value: " + currentSymbol.getValues());
-                    System.out.println(" Is written to?: " + (currentSymbol.getValues().size() > 0));
-                    System.out.println(" Is read from?: " + currentSymbol.getIsRead());
-                    if (currentSymbol.getValues().size() == 0) {
+                    if (currentSymbol.getValues().size() > 0) {
+                        System.out.println(" Values: " + currentSymbol.printValues());
+                    }
+                    else {
+                        System.out.println(" Values: {}");
                         variablesNotWritten++;
                     }
+
+                    System.out.println(" Is written to?: " + (currentSymbol.getValues().size() > 0));
+                    System.out.println(" Is read from?: " + currentSymbol.getIsRead());
                     if (!currentSymbol.getIsRead()) {
                         variablesNotRead++;
                     }
@@ -184,7 +188,7 @@ public class Visitor implements CCALParserVisitor {
     public Object visit(ASTParam node, Object data) {
         HashMap<String, Symbol> mapTemp = symbolTable.get(currentScope);
         if (mapTemp == null) {
-            mapTemp = new HashMap<String, Symbol>();
+            mapTemp = new HashMap<>();
         }
 
         Token id = (Token) node.jjtGetChild(0).jjtAccept(this, null);
@@ -212,7 +216,8 @@ public class Visitor implements CCALParserVisitor {
             // same param id already in this function
             errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Duplicate parameter names, \"" + id.image + "\" for function \"" + funcId.image + "\""));
         } else {
-            funcStc.addValue(id.image, type.image);
+            Variable variable = new Variable(funcStc.getType().toString(),id.image);
+            funcStc.addValue(id.image, variable);
             mapTemp.put(funcId.image, funcStc);
             symbolTable.put(foundIn, mapTemp);
         }
@@ -251,7 +256,7 @@ public class Visitor implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTNot node, Object data) {
-        Node node1 = (Node) node.jjtGetChild(0);
+        Node node1 = node.jjtGetChild(0);
         Token child = (Token) node.jjtGetChild(0).jjtAccept(this, null);
         if(node1 instanceof ASTVariable) {
             // check if var or const has been declared before
@@ -275,11 +280,7 @@ public class Visitor implements CCALParserVisitor {
             // error if number
             errorList.add(new ErrorMessage(child.beginLine,child.beginColumn,"Invalid value for boolean comparison"));
 
-        } else if(node1 instanceof ASTBoolean) {
-            // no error
-        } else {
-            // if child is of type; Equals, NotEquals, LessThan, LessThanOrEqualTo, GreaterThan,
-            //    GreaterThanOrEqualTo, OR, AND, Not, Positive or Negative. Then, accept children
+        } else if(!(node1 instanceof ASTBoolean)) {
             node.childrenAccept(this, data);
         }
 
@@ -296,12 +297,10 @@ public class Visitor implements CCALParserVisitor {
     public Object visit(ASTConstDeclaration node, Object data) {
         HashMap<String, Symbol> mapTemp = symbolTable.get(currentScope);
         if (mapTemp == null) {
-            mapTemp = new HashMap<String, Symbol>();
+            mapTemp = new HashMap<>();
         }
 
         Token id = (Token) node.jjtGetChild(0).jjtAccept(this, null);
-        // if the const has not been declared already, add it to the symbolTable
-        // if the const has been declared already, then we have an error
         if (mapTemp.get(id.image) == null) {
             Token type = (Token) node.jjtGetChild(1).jjtAccept(this, null);
             Symbol symbol = new Symbol();
@@ -312,16 +311,14 @@ public class Visitor implements CCALParserVisitor {
             symbolTable.put(currentScope, mapTemp);
             mapTemp.put(id.image, symbol);
 
-            // add the const value to the map of values
-            // since its a const this value should not ever change
             Token value = (Token) node.jjtGetChild(2).jjtAccept(this, null);
             if (type.image.equals("integer") && !isInt(value.image)) {
-                System.out.println("Cannot assign boolean \"" + value.image + "\" to constant \"" + id.image + "\"");
                 errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Cannot assign boolean \"" + value.image + "\" to constant \"" + id.image + "\""));
             } else if (type.image.equals("boolean") && !isBoolean(value.image)) {
                 errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Cannot assign number \"" + value.image + "\" to constant \"" + id.image + "\""));
             } else {
-                symbol.addValue(id.image, value);
+                Variable variable = new Variable(symbol.getType().toString(),value.image.toLowerCase());
+                symbol.addValue(id.image, variable);
             }
 
             mapTemp.put(id.image, symbol);
@@ -351,7 +348,7 @@ public class Visitor implements CCALParserVisitor {
 
         HashMap<String, Symbol> mapTemp2 = symbolTable.get(currentScope);
         if (mapTemp2 == null) {
-            mapTemp2 = new HashMap<String, Symbol>();
+            mapTemp2 = new HashMap<>();
         }
 
         // if the var has not been declared already, add it to the symbolTable
@@ -413,46 +410,31 @@ public class Visitor implements CCALParserVisitor {
     public Object visit(ASTMinus node, Object data) {
         // check if id has been declared
         Token id = (Token) node.jjtGetChild(0).jjtAccept(this, null);
-        String foundIn = currentScope;
-        String foundIn2 = currentScope;
 
-        HashMap<String, Symbol> mapTemp = symbolTable.get(currentScope);
-        Symbol idStc = mapTemp.get(id.image);
-        if (idStc == null) {
-            mapTemp = symbolTable.get("Program");
-            foundIn = "Program";
-            idStc = mapTemp.get(id.image);
+        HashMap<String, Symbol> currentSymbolTable = symbolTable.get(currentScope);
+        Symbol symbol = currentSymbolTable.get(id.image);
+        if (symbol == null) {
+            currentSymbolTable = symbolTable.get("Program");
+            symbol = currentSymbolTable.get(id.image);
         }
 
-        if (idStc == null) {
+        if (symbol == null) {
             // error if still not declared
-            errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Variable \"" + id.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Program\""));
-        } else if (idStc.getValues().size() == 0) {
+            errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Variable \"" + id.image + "\" not declared in any scope"));
+        } else if (symbol.getValues().size() == 0) {
             if (currentScope.equals("Program") || currentScope.equals("Main")) {
                 // error if var has no value
                 errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Variable \"" + id.image + "\" has no value in currentScope \"" + currentScope + "\""));
             }
-        } else if (!idStc.getType().image.equals("integer")) {
-            // var / const has been declared and has value
-            // error if var is of type boolean
-            errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Cannot create negative value from " + idStc.getDataType().toString().toLowerCase() + " \"" + id.image + "\". Not of type integer"));
+        } else if (!symbol.getType().image.equals("integer")) {
+            errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Cannot create negative value from " + symbol.getDataType() + " \"" + id.image + "\". Not of type integer"));
         } else {
-            // set value for assignment
-            Token parentId = (Token) node.jjtGetParent().jjtGetChild(0).jjtAccept(this, null);
-            HashMap<String, Symbol> mapTemp2 = symbolTable.get(currentScope);
-            Symbol parentStc = mapTemp2.get(id.image);
-            if (parentStc == null) {
-                mapTemp2 = symbolTable.get("Program");
-                foundIn2 = "Program";
-                parentStc = mapTemp2.get(id.image);
-            }
-            parentStc.addValue(id.image, id);
-            symbolTable.put(foundIn2, mapTemp);
-
+            Variable variable = new Variable(symbol.getType().toString(),"-" +id);
+            symbol.addValue(id.image, variable);
             // set isRead value
-            idStc.setIsRead(true);
-            mapTemp.put(id.image, idStc);
-            symbolTable.put(foundIn, mapTemp);
+            symbol.setIsRead(true);
+            symbol.setIsCalled(true);
+            updateScope(id.image,symbol);
         }
 
         return null;
@@ -480,7 +462,7 @@ public class Visitor implements CCALParserVisitor {
                 } else if (numArgsDeclared > 0) {
                     int i = 0;
                     for (String key : funcStc.getValues().keySet()) {
-                        String type = (String) funcStc.getValues().get(key);
+                        String type = funcStc.getValues().get(key).get(0).getType();
                         Token argi = (Token) node.jjtGetChild(i).jjtGetChild(0).jjtAccept(this, null);
                         Symbol argiStc = mapTemp.get(argi.image);
                         if (argiStc == null) {
@@ -565,37 +547,37 @@ public class Visitor implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTEqual node, Object data) {
-        isValidBooleanVariable(node,data);
+        isValidBooleanOperation(node,data);
         return null;
     }
 
     @Override
     public Object visit(ASTNotEqual node, Object data) {
-        isValidBooleanVariable(node,data);
+        isValidBooleanOperation(node,data);
         return null;
     }
 
     @Override
     public Object visit(ASTLessThan node, Object data) {
-        isValidBooleanVariable(node,data);
+        isValidBooleanOperation(node,data);
         return null;
     }
 
     @Override
     public Object visit(ASTLessThanEqual node, Object data) {
-        isValidBooleanVariable(node,data);
+        isValidBooleanOperation(node,data);
         return null;
     }
 
     @Override
     public Object visit(ASTGreaterThan node, Object data) {
-        isValidBooleanVariable(node,data);
+        isValidBooleanOperation(node,data);
         return null;
     }
 
     @Override
     public Object visit(ASTGreaterThanEqual node, Object data) {
-        isValidBooleanVariable(node,data);
+        isValidBooleanOperation(node,data);
         return null;
     }
 
@@ -728,7 +710,8 @@ public class Visitor implements CCALParserVisitor {
                 } else if (idStc.getValues().size() == 0) {
                     // if its initial value has already been stored, leave it
                     idStc.setIsRead(true);
-                    idStc.addValue(id.image, value);
+                    Variable variable = new Variable(idStc.getType().toString(),value.toString());
+                    idStc.addValue(id.image, variable);
                     mapTemp.put(id.image, idStc);
                     symbolTable.put(currentScope, mapTemp);
 
@@ -753,7 +736,8 @@ public class Visitor implements CCALParserVisitor {
                     errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Cannot assign type number to \"" + id.image + "\""));
                 } else if (idStc.getValues().size() == 0) {
                     // if its initial value has already been stored, leave it
-                    idStc.addValue(id.image, value);
+                    Variable variable = new Variable(idStc.getType().toString(),value.toString());
+                    idStc.addValue(id.image, variable);
                     idStc.setIsCalled(true);
                     updateScope(id.image, idStc);
                 }
@@ -762,32 +746,40 @@ public class Visitor implements CCALParserVisitor {
                     // error
                     // if attempting to assign boolean to id not of type boolean
                     errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Cannot assign type boolean to \"" + id.image + "\""));
-                } else if (idStc.getValues().size() == 0) {
-                    // if its initial value has already been stored, leave it
-                    idStc.addValue(id.image, value);
-                    mapTemp.put(id.image, idStc);
-                    symbolTable.put(currentScope, mapTemp);
                 }
+                // if its initial value has already been stored, leave it
+                Variable variable = new Variable(idStc.getType().toString(),value.toString());
+                idStc.addValue(id.image, variable);
+                mapTemp.put(id.image, idStc);
+                symbolTable.put(currentScope, mapTemp);
             } else if (valueNode instanceof ASTFunctionCall ||
                     valueNode instanceof ASTPos ||
                     valueNode instanceof ASTMinus) {
                 Token subChild = (Token) valueNode.jjtGetChild(0).jjtAccept(this, null);
-                if (idStc.getValues().size() == 0) {
-                    // if its initial value has already been stored, leave it
-                    idStc.addValue(subChild.image, subChild);
-                    mapTemp.put(id.image, idStc);
-                    symbolTable.put(currentScope, mapTemp);
-                }
+                // if its initial value has already been stored, leave it
+                Variable variable = new Variable(idStc.getType().toString(),subChild.toString());
+                idStc.addValue(subChild.image, variable);
+                mapTemp.put(id.image, idStc);
+                symbolTable.put(currentScope, mapTemp);
             } else if (valueNode instanceof ASTAdd ||
                     valueNode instanceof ASTSubtract) {
                 Token subChild1 = (Token) valueNode.jjtGetChild(0).jjtAccept(this, null);
                 Token subChild2 = (Token) valueNode.jjtGetChild(1).jjtAccept(this, null);
-                if (idStc.getValues().size() == 0) {
-                    // if its initial value has already been stored, leave it
-                    idStc.addValue(subChild1.image, subChild1);
-                    idStc.addValue(subChild2.image, subChild2);
-                    mapTemp.put(id.image, idStc);
-                    symbolTable.put(currentScope, mapTemp);
+                // if its initial value has already been stored, leave it
+                String operator = "-";
+                if(valueNode instanceof ASTAdd)
+                    operator = "+";
+                Variable variable1 = new Variable(idStc.getType().toString(),subChild1.toString() + operator + subChild2.toString());
+                idStc.addValue(subChild1.image, variable1);
+                mapTemp.put(id.image, idStc);
+                symbolTable.put(currentScope, mapTemp);
+                
+                //update tokens if variables
+                if(valueNode.jjtGetChild(0) instanceof  ASTVariable){
+                    setAsReadAndCalled(subChild1);
+                }
+                if(valueNode.jjtGetChild(1) instanceof  ASTVariable){
+                    setAsReadAndCalled(subChild2);
                 }
             } else {
                 node.childrenAccept(this, data);
@@ -802,15 +794,25 @@ public class Visitor implements CCALParserVisitor {
         return null;
     }
 
-    private void updateScope(String image, Symbol symbol) {
+    private void setAsReadAndCalled(Token token){
+        Symbol rightSymbol =  symbolTable.get(currentScope).get(token.image);
+        if(rightSymbol == null){
+            rightSymbol =  symbolTable.get("Program").get(token.image);
+        }
+        rightSymbol.setIsRead(true);
+        rightSymbol.setIsCalled(true);
+        updateScope(token.image,rightSymbol);
+    }
+
+    private void updateScope(String symbolName, Symbol symbol) {
         HashMap<String, Symbol> tempMap;
         if (symbol.getScope().equals(currentScope)) {
             tempMap = symbolTable.get(currentScope);
-            tempMap.put(image, symbol);
+            tempMap.put(symbolName, symbol);
             symbolTable.put(currentScope, tempMap);
         } else {
             tempMap = symbolTable.get(symbol.getScope());
-            tempMap.put(image, symbol);
+            tempMap.put(symbolName, symbol);
             symbolTable.put(symbol.getScope(), tempMap);
         }
     }
@@ -848,121 +850,116 @@ public class Visitor implements CCALParserVisitor {
         return Boolean.parseBoolean(s);
     }
 
-    //Evaluate node and return if their are children nodes to go down
+    //Evaluate boolean comparison (AND & OR) node and return if their are children nodes to go down
     private void isValidBooleanComparison(Node parentNode, Object data) {
-        Node node1 = parentNode.jjtGetChild(0);
-        Token child1 = (Token) parentNode.jjtGetChild(0).jjtAccept(this, null);
-        if (checkBooleanComparison(node1, child1)) {
-            // if child is of type; Equals, NotEquals, LessThan, LessThanOrEqualTo, GreaterThan,
-            //    GreaterThanOrEqualTo, OR, AND, Not, Positive or Negative. Then, accept children
-            if (parentNode instanceof ASTAnd) {
-                ASTAnd node = (ASTAnd) parentNode;
-                node.childrenAccept(this, data);
-            } else {
-                ASTOr node = (ASTOr) parentNode;
-                node.childrenAccept(this, data);
-            }
+        Node leftNode = parentNode.jjtGetChild(0);
+        Token leftToken = (Token) parentNode.jjtGetChild(0).jjtAccept(this, null);
+        if (checkBooleanComparison(leftNode, leftToken)) {
+            evaluateChildCondition(parentNode,data);
         }
 
-        Node node2 = parentNode.jjtGetChild(1);
-        Token child2 = (Token) parentNode.jjtGetChild(1).jjtAccept(this, null);
-        if (checkBooleanComparison(node2, child2)) {
-            // if child is of type; Equals, NotEquals, LessThan, LessThanOrEqualTo, GreaterThan,
-            //    GreaterThanOrEqualTo, OR, AND, Not, Positive or Negative. Then, accept children
-
+        Node rightNode = parentNode.jjtGetChild(1);
+        Token rightToken = (Token) parentNode.jjtGetChild(1).jjtAccept(this, null);
+        if (checkBooleanComparison(rightNode, rightToken)) {
+            evaluateChildCondition(parentNode,data);
         }
     }
 
-    //returns if there is a child node
+    //Evaluates boolean condition and returns if there is a child node
     private boolean checkBooleanComparison(Node node, Token token) {
         if (node instanceof ASTVariable) {
-            // check if var or const has been declared before
-            Symbol child2Stc = symbolTable.get(currentScope).get(token.image);
-            if (child2Stc == null) {
-                child2Stc = symbolTable.get("Program").get(token.image);
+            Symbol symbol = symbolTable.get(currentScope).get(token.image);
+            if (symbol == null) {
+                symbol = symbolTable.get("Program").get(token.image);
             }
-            if (child2Stc == null) {
-                // error if var or const has not been declared before
-                errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Variable or Const \"" + token.image + "\" not declared in scope \"" + currentScope + "\" or \"Program\""));
+            if (symbol == null) {
+                errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Variable or Const \"" + token.image + "\" not declared in  any scope \""));
                 return false;
-            } else if (child2Stc.getValues().size() == 0) {
+            } else if (symbol.getValues().size() == 0) {
                 if (currentScope.equals("Program") || currentScope.equals("Main")) {
                     // error if var has no value
                     errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Variable \"" + token.image + "\" has no value in scope \"" + currentScope + "\""));
                     return false;
                 }
-            } else if (!child2Stc.getType().image.equals("boolean")) {
+            } else if (!symbol.getType().image.equals("boolean")) {
                 // error if is not a boolean
                 System.out.println();
-                errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, child2Stc.getDataType() + " \"" + token.image + "\" is not of type boolean"));
+                errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, symbol.getDataType() + " \"" + token.image + "\" is not of type boolean"));
                 return false;
             }
         } else if (node instanceof ASTDigit) {
-            // error if number
             errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Invalid type for comparison"));
             return false;
         } else if (node instanceof ASTBoolean) {
-            // no error
             return false;
         }
         return true;
     }
 
-    private void isValidBooleanVariable(Node parentNode, Object data) {
-        String child1type = "";
-        Node node1 = (Node) parentNode.jjtGetChild(0);
-        Token child1 = (Token) parentNode.jjtGetChild(0).jjtAccept(this, null);
-        if (node1 instanceof ASTVariable) {
+    //Evaluate two sides of boolean operation eg. greater than, equals
+    private void isValidBooleanOperation(Node parentNode, Object data) {
+        String leftSymbolType = "";
+        Node leftNode = parentNode.jjtGetChild(0);
+        Token leftToken = (Token) parentNode.jjtGetChild(0).jjtAccept(this, null);
+        if (leftNode instanceof ASTVariable) {
             // check if var or const has been declared before
-            Symbol child1Stc = symbolTable.get(currentScope).get(child1.image);
-            if (child1Stc == null) {
-                child1Stc = symbolTable.get("Program").get(child1.image);
+            Symbol leftSymbol = symbolTable.get(currentScope).get(leftToken.image);
+            if (leftSymbol == null) {
+                leftSymbol = symbolTable.get("Program").get(leftToken.image);
             }
-            if (child1Stc == null) {
+            if (leftSymbol == null) {
                 // error if var or const has not been declared before
-                errorList.add(new ErrorMessage(child1.beginLine, child1.beginColumn, "Variable or Const \"" + child1.image + "\" not declared in scope \"" + currentScope + "\" or \"Program\""));
+                errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "Variable or Const \"" + leftToken.image + "\" not declared in any scope \""));
             } else {
-                child1type = child1Stc.getType().image;
+                leftSymbolType = leftSymbol.getType().image;
+                leftSymbol.setIsRead(true);
+                updateScope(leftToken.image,leftSymbol);
 
-                if (child1Stc.getValues().size() == 0) {
+                if (leftSymbol.getValues().size() == 0) {
                     if (currentScope.equals("Program") || currentScope.equals("Main")) {
                         // error if var has no value
-                        errorList.add(new ErrorMessage(child1.beginLine, child1.beginColumn, "Variable \"" + child1.image + "\" has no value in scope \"" + currentScope + "\""));
+                        errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "Variable \"" + leftToken.image + "\" has no value in scope \"" + currentScope + "\""));
                     }
                 }
             }
-        } else if (node1 instanceof ASTDigit) {
-            child1type = "integer";
-        } else if (node1 instanceof ASTBoolean) {
-            child1type = "boolean";
+        } else if (leftNode instanceof ASTDigit) {
+            leftSymbolType = "integer";
+        } else if (leftNode instanceof ASTBoolean) {
+            leftSymbolType = "boolean";
         }
 
-        Node node2 = (Node) parentNode.jjtGetChild(1);
-        Token child2 = (Token) parentNode.jjtGetChild(1).jjtAccept(this, null);
-        if (node2 instanceof ASTVariable) {
+        Node rightNode = parentNode.jjtGetChild(1);
+        Token rightToken = (Token) parentNode.jjtGetChild(1).jjtAccept(this, null);
+        if (rightNode instanceof ASTVariable) {
             // check if var or const has been declared before
-            Symbol child2Stc = symbolTable.get(currentScope).get(child2.image);
-            if (child2Stc == null) {
-                child2Stc = symbolTable.get("Program").get(child2.image);
+            Symbol rightSymbol = symbolTable.get(currentScope).get(rightToken.image);
+            if (rightSymbol == null) {
+                rightSymbol = symbolTable.get("Program").get(rightToken.image);
             }
-            if (child2Stc == null) {
+            if (rightSymbol == null) {
                 // error if var or const has not been declared before
-                errorList.add(new ErrorMessage(child1.beginLine, child1.beginColumn, "Variable or Const \"" + child2.image + "\" not declared in scope \"" + currentScope + "\" or \"Program\""));
-            } else if (child2Stc.getValues().size() == 0) {
+                errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "Variable or Constant \"" + rightToken.image + "\" not declared in any scope \""));
+            } else if (rightSymbol.getValues().size() == 0) {
                 if (currentScope.equals("Program") || currentScope.equals("Main")) {
                     // error if var has no value
-                    errorList.add(new ErrorMessage(child1.beginLine, child1.beginColumn, "Variable \"" + child2.image + "\" has no value in scope \"" + currentScope + "\""));
+                    errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "Variable \"" + rightToken.image + "\" has no value in current scope \"" + currentScope + "\""));
                 }
-            } else if (!child2Stc.getType().image.equals(child1type)) {
+                rightSymbol.setIsRead(true);
+                updateScope(leftToken.image,rightSymbol);
+            } else if (!rightSymbol.getType().image.equals(leftSymbolType)) {
                 // error if is not a boolean
-                errorList.add(new ErrorMessage(child1.beginLine, child1.beginColumn, child2Stc.getDataType() + " \"" + child2.image + "\" is not of type " + child1type));
+                errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, rightSymbol.getDataType() + " \"" + rightToken.image + "\" is not of type " + leftSymbolType));
             }
-        } else if ((node2 instanceof ASTDigit && !child1type.equals("integer")) || (node2 instanceof ASTBoolean && !child1type.equals("boolean"))) {
+
+        } else if ((rightNode instanceof ASTDigit && !leftSymbolType.equals("integer")) || (rightNode instanceof ASTBoolean && !leftSymbolType.equals("boolean"))) {
             // error if number
-            errorList.add(new ErrorMessage(child1.beginLine, child1.beginColumn, "Invalid boolean using \"" + child2.image));
+            errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "Invalid boolean using \"" + rightToken.image));
         }
-        // if child is of type; Equals, NotEquals, LessThan, LessThanOrEqualTo, GreaterThan,
-        //    GreaterThanOrEqualTo, OR, AND, Not, Positive or Negative. Then, accept children
+        evaluateChildCondition(parentNode,data);
+    }
+
+    private void evaluateChildCondition(Node parentNode, Object data){
+        //Allow for inner evaluation of child comparisons
         if (parentNode instanceof ASTAnd) {
             ASTAnd node = (ASTAnd) parentNode;
             node.childrenAccept(this, data);
@@ -1006,7 +1003,7 @@ public class Visitor implements CCALParserVisitor {
 
         @Override
         public String toString() {
-            return "Error at line " + lineNumber + ", column " + columnNumber + "\n" + errorMessage;
+            return "Error at line " + lineNumber + ", column " + columnNumber + ":\n" + errorMessage;
         }
     }
 }

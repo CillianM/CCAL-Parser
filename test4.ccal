@@ -8,6 +8,7 @@ begin
   if ( x < 0 )
   begin
     minus_sign = true;
+    x = 1;
     x = -x;
   end
   else
