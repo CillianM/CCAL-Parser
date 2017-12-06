@@ -12,8 +12,8 @@ end
 main
 begin
   var isTrue:boolean;
-  i = 1;
-  if ( five == i )
+  i = -1;
+  if  ~(five == i)
   begin
     isTrue = true;
   end

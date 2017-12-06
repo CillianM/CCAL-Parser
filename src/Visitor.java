@@ -5,12 +5,18 @@ import java.util.Set;
 
 public class Visitor implements CCALParserVisitor {
 
-    private String currentScope = "Program"; // Initial currentScope, will always start with program
-    private String previousScope;
     private HashMap<String, HashMap<String, Symbol>> symbolTable = new HashMap<>();
+    //Keep track of the scope we're in along with what the above scope was --> for nesting
+    private static final String PROGRAMME = "Programme";
+    private static final String MAIN = "Main";
+    private String currentScope = PROGRAMME;
+    private String previousScope;
+    //Is every variable both written to and read from?
     private int variablesNotWritten = 0;
     private int variablesNotRead = 0;
+    //Is every function called?
     private int functionsNotCalled = 0;
+    //Easy way to keep track of all error messages to be printed out at the end
     private List<ErrorMessage> errorList = new ArrayList<>();
 
     @Override
@@ -24,13 +30,12 @@ public class Visitor implements CCALParserVisitor {
         symbolTable.put(currentScope, new HashMap<>());
         node.childrenAccept(this, data);
 
-        // Perform semantic checks over symbol table once programme has been read
+        //Print out the symbol table and perform the semantic checks once the programme is evaluated
         System.out.println("-----Start Symbol Table-----");
         Set scopes = symbolTable.keySet();
-        for (Object scope : scopes) {
+        for (Object scope : scopes) { //Loop through each scope of the programme
             String scopeName = (String) scope;
             System.out.println("-----Start " + scopeName + " Scope-----");
-
             Set symbols = symbolTable.get(scopeName).keySet();
             if (symbols.size() == 0) {
                 System.out.println(" Nothing declared");
@@ -41,21 +46,19 @@ public class Visitor implements CCALParserVisitor {
                 System.out.println(symbolName);
                 System.out.println(" DataType: " + currentSymbol.getDataType());
                 System.out.println(" Type: " + currentSymbol.getType());
-                if (currentSymbol.getDataType() == DataType.Function) {
+                if (currentSymbol.getDataType() == DataType.Function) { //so we know what variables of the symbol to access
                     System.out.println(" Parameters: " + currentSymbol.printValues());
                     System.out.println(" Is called?: " + currentSymbol.getIsCalled());
                     if (!currentSymbol.getIsCalled()) {
-                        functionsNotCalled++;
+                        functionsNotCalled++; //update counter if it has not been called
                     }
                 } else {
                     if (currentSymbol.getValues().size() > 0) {
-                        System.out.println(" Values: " + currentSymbol.printValues());
-                    }
-                    else {
-                        System.out.println(" Values: {}");
+                        System.out.println(" Values: " + currentSymbol.printValues()); //print out all assignments of this variable
+                    } else {
+                        System.out.println(" Values: No assignments made"); //Variable has not been written to, update counter
                         variablesNotWritten++;
                     }
-
                     System.out.println(" Is written to?: " + (currentSymbol.getValues().size() > 0));
                     System.out.println(" Is read from?: " + currentSymbol.getIsRead());
                     if (!currentSymbol.getIsRead()) {
@@ -63,16 +66,16 @@ public class Visitor implements CCALParserVisitor {
                     }
                 }
             }
-            System.out.println("-----End " + scopeName + " Scope-----");
+            System.out.println("-----End " + scopeName + " Scope-----"); //Show end of scope
         }
         System.out.println("-----End Symbol Table-----");
 
-        if (errorList.size() == 0) {
+        if (errorList.size() == 0) { //make sure there are no errors
             isSematicError();
             System.out.println("No errors found");
             Representer representer = new Representer();
             node.jjtAccept(representer, symbolTable);
-        } else {
+        } else { //print out errors from the object list
             System.out.println(errorList.size() + " error(s).");
             printErrorList();
         }
@@ -84,8 +87,8 @@ public class Visitor implements CCALParserVisitor {
     public Object visit(ASTMain node, Object data) {
         // update to currentScope of function
         previousScope = currentScope;
-        currentScope = "Main";
-        symbolTable.put(currentScope, new HashMap<>());
+        currentScope = MAIN;
+        symbolTable.put(currentScope, new HashMap<>()); //create the hashmap for the main scope
         node.childrenAccept(this, data);
 
         // update currentScope to previous currentScope
@@ -107,37 +110,38 @@ public class Visitor implements CCALParserVisitor {
             currentHashScopeMap = new HashMap<>();
         }
 
-        Token type = (Token) node.jjtGetChild(0).jjtAccept(this, null);
-        Token name = (Token) node.jjtGetChild(1).jjtAccept(this, null);
-        Symbol symbol = new Symbol();
-        symbol.setName(name);
-        symbol.setType(type);
+        Token functionType = (Token) node.jjtGetChild(0).jjtAccept(this, null); //get function type (eg. integer, boolean)
+        Token functionName = (Token) node.jjtGetChild(1).jjtAccept(this, null); //get function name
+        Symbol symbol = new Symbol(); //create symbol for this function
+        symbol.setName(functionName);
+        symbol.setType(functionType);
         symbol.setScope(currentScope);
         symbol.setDataType(DataType.Function);
-        symbol.setNumArgs(node.jjtGetChild(2).jjtGetNumChildren());
+        symbol.setNumArgs(node.jjtGetChild(2).jjtGetNumChildren()); //get the number of arguments through it's children
 
-        //Check if we already have the function
-        if (currentHashScopeMap.containsKey(name.image)) {
-            Symbol originalFunc = currentHashScopeMap.get(name.image);
-            //Check if it contains the same number of arguments
+        //Check if the function already exists
+        if (currentHashScopeMap.containsKey(functionName.image)) {
+            Symbol originalFunc = currentHashScopeMap.get(functionName.image);
+            //Even if it does exist does it have the same amount of parameters?
             if (originalFunc.getNumArgs() == symbol.getNumArgs()) {
-                errorList.add(new ErrorMessage(name.beginLine, name.beginColumn, "Function \"" + name.image + "\" already declared with " + symbol.getNumArgs() + " parameters"));
+                //Throw an error if it does exist already with the same amount of parameters
+                errorList.add(new ErrorMessage(functionName.beginLine, functionName.beginColumn, "Function \"" + functionName.image + "\" already declared with " + symbol.getNumArgs() + " parameters"));
             }
         } else {
-            currentHashScopeMap.put(name.image, symbol);
+            //otherwise update the symbol table with this new function
+            currentHashScopeMap.put(functionName.image, symbol);
             symbolTable.put(currentScope, currentHashScopeMap);
         }
 
-
-        //Update current scope to function
+        //Update current scope to function so we can evaluate it's children
         previousScope = currentScope;
-        currentScope = name.image;
+        currentScope = functionName.image;
 
         //Evaluate to functions params and body
         node.jjtGetChild(2).jjtAccept(this, null);
         node.jjtGetChild(3).jjtAccept(this, null);
 
-        //Revert back scope
+        //Revert back to current scope scope
         currentScope = previousScope;
         previousScope = null;
 
@@ -153,27 +157,22 @@ public class Visitor implements CCALParserVisitor {
     @Override
     public Object visit(ASTReturnStatement node, Object data) {
         if (node.jjtGetNumChildren() > 0) {
-            Token id = (Token) node.jjtGetChild(0).jjtAccept(this, null);
-            Node node1 = node.jjtGetChild(0);
-            if (node1 instanceof ASTVariable) {
-                String foundIn = currentScope;
-
-                HashMap<String, Symbol> mapTemp = symbolTable.get(currentScope);
-                Symbol idStc = mapTemp.get(id.image);
-                if (idStc == null) {
-                    mapTemp = symbolTable.get("Program");
-                    foundIn = "Program";
-                    idStc = mapTemp.get(id.image);
+            Token returnedToken = (Token) node.jjtGetChild(0).jjtAccept(this, null);
+            Node returnedNode = node.jjtGetChild(0);
+            if (returnedNode instanceof ASTVariable) {
+                HashMap<String, Symbol> currentSymbolTable = symbolTable.get(currentScope);
+                Symbol returnedSymbol = currentSymbolTable.get(returnedToken.image);
+                if (returnedSymbol == null) {
+                    currentSymbolTable = symbolTable.get(PROGRAMME);
+                    returnedSymbol = currentSymbolTable.get(returnedToken.image);
                 }
-                if (idStc.getValues().size() == 0) {
-                    if (currentScope.equals("Program") || currentScope.equals("Main")) {
-                        // error if var has no value
-                        errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Variable \"" + id.image + "\" has no value in currentScope \"" + currentScope + "\""));
+                if (returnedSymbol.getValues().size() == 0) { //check if there are any values assigned to value
+                    if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) { //If we're in anything but the function (as the value in the function came from a param)
+                        errorList.add(new ErrorMessage(returnedToken.beginLine, returnedToken.beginColumn, "Variable \"" + returnedToken.image + "\" has no value in currentScope \"" + currentScope + "\""));
                     }
                 }
-                idStc.setIsRead(true);
-                mapTemp.put(id.image, idStc);
-                symbolTable.put(foundIn, mapTemp);
+                returnedSymbol.setIsRead(true);
+                updateSymbol(returnedToken.image, returnedSymbol);
             }
         }
         node.childrenAccept(this, data);
@@ -188,42 +187,35 @@ public class Visitor implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTParam node, Object data) {
-        HashMap<String, Symbol> mapTemp = symbolTable.get(currentScope);
-        if (mapTemp == null) {
-            mapTemp = new HashMap<>();
+        HashMap<String, Symbol> currentSymbolTable = symbolTable.get(currentScope);
+        if (currentSymbolTable == null) { //If this is the first param then the scope for the function won't be set yet
+            currentSymbolTable = new HashMap<>();
         }
 
-        Token id = (Token) node.jjtGetChild(0).jjtAccept(this, null);
-        Token type = (Token) node.jjtGetChild(1).jjtAccept(this, null);
-
-        Symbol symbol = new Symbol();
-        symbol.setName(id);
-        symbol.setType(type);
+        Token paramName = (Token) node.jjtGetChild(0).jjtAccept(this, null); //name of the parameter
+        Token paramType = (Token) node.jjtGetChild(1).jjtAccept(this, null); //type of parameter (eg. integer)
+        Symbol symbol = new Symbol(); //create symbol for the param
+        symbol.setName(paramName);
+        symbol.setType(paramType);
         symbol.setScope(currentScope);
         symbol.setDataType(DataType.ParamVariable);
-        mapTemp.put(id.image, symbol);
-        symbolTable.put(currentScope, mapTemp);
+        currentSymbolTable.put(paramName.image, symbol);
+        symbolTable.put(currentScope, currentSymbolTable);
 
-        Token funcId = (Token) node.jjtGetParent().jjtGetParent().jjtGetChild(1).jjtAccept(this, null);
-        String foundIn = currentScope;
-        mapTemp = symbolTable.get(currentScope);
-        Symbol funcStc = mapTemp.get(funcId.image);
-        if (funcStc == null) {
-            mapTemp = symbolTable.get("Program");
-            funcStc = mapTemp.get(funcId.image);
-            foundIn = "Program";
+        Token functionName = (Token) node.jjtGetParent().jjtGetParent().jjtGetChild(1).jjtAccept(this, null);
+        currentSymbolTable = symbolTable.get(currentScope);
+        Symbol functionSymbol = currentSymbolTable.get(functionName.image);
+        if (functionSymbol == null) {
+            currentSymbolTable = symbolTable.get(PROGRAMME);
+            functionSymbol = currentSymbolTable.get(functionName.image);
         }
-        if (funcStc.getValues().containsKey(id.image)) {
-            // error
-            // same param id already in this function
-            errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Duplicate parameter names, \"" + id.image + "\" for function \"" + funcId.image + "\""));
+        if (functionSymbol.getValues().containsKey(paramName.image)) { //check if the parameter is already in use for the function
+            errorList.add(new ErrorMessage(paramName.beginLine, paramName.beginColumn, "Duplicate parameter names, \"" + paramName.image + "\" for function \"" + functionName.image + "\""));
         } else {
-            Variable variable = new Variable(funcStc.getType().toString(),id.image);
-            funcStc.addValue(id.image, variable);
-            mapTemp.put(funcId.image, funcStc);
-            symbolTable.put(foundIn, mapTemp);
+            Variable variable = new Variable(functionSymbol.getType().toString(), paramName.image);
+            functionSymbol.addValue(paramName.image, variable);
+            updateSymbol(functionName.image, functionSymbol);
         }
-
         return null;
     }
 
@@ -258,34 +250,7 @@ public class Visitor implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTNot node, Object data) {
-        Node node1 = node.jjtGetChild(0);
-        Token child = (Token) node.jjtGetChild(0).jjtAccept(this, null);
-        if(node1 instanceof ASTVariable) {
-            // check if var or const has been declared before
-            Symbol childStc = symbolTable.get(currentScope).get(child.image);
-            if(childStc == null) {
-                childStc = symbolTable.get("Program").get(child.image);
-            }
-            if(childStc == null) {
-                // error if var or const has not been declared before
-                errorList.add(new ErrorMessage(child.beginLine,child.beginColumn,"Variable or Const \"" + child.image + "\" not declared in scope \"" + currentScope + "\" or \"Program\""));
-            } else if(childStc.getValues().size() == 0) {
-                if(currentScope.equals("Program") || currentScope.equals("Main")) {
-                    // error if var has no value
-                    errorList.add(new ErrorMessage(child.beginLine,child.beginColumn,"Variable \"" + child.image + "\" has no value in scope \"" + currentScope + "\""));
-                }
-            } else if(!childStc.getType().image.equals("boolean")) {
-                // error if is not a boolean
-                errorList.add(new ErrorMessage(child.beginLine,child.beginColumn,childStc.getDataType() + " \"" + child.image + "\" is not of type boolean"));
-            }
-        } else if(node1 instanceof ASTDigit) {
-            // error if number
-            errorList.add(new ErrorMessage(child.beginLine,child.beginColumn,"Invalid value for boolean comparison"));
-
-        } else if(!(node1 instanceof ASTBoolean)) {
-            node.childrenAccept(this, data);
-        }
-
+        node.childrenAccept(this, data);
         return null;
     }
 
@@ -297,223 +262,179 @@ public class Visitor implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTConstDeclaration node, Object data) {
-        HashMap<String, Symbol> mapTemp = symbolTable.get(currentScope);
-        if (mapTemp == null) {
-            mapTemp = new HashMap<>();
+        HashMap<String, Symbol> currentScopeSymbolTable = symbolTable.get(currentScope);
+        if (currentScopeSymbolTable == null) {
+            currentScopeSymbolTable = new HashMap<>();
         }
-
-        Token id = (Token) node.jjtGetChild(0).jjtAccept(this, null);
-        if (mapTemp.get(id.image) == null) {
-            Token type = (Token) node.jjtGetChild(1).jjtAccept(this, null);
-            Symbol symbol = new Symbol();
-            symbol.setName(id);
-            symbol.setType(type);
+        Token contantName = (Token) node.jjtGetChild(0).jjtAccept(this, null); //get the constant name
+        if (currentScopeSymbolTable.get(contantName.image) == null) { //Check that the constant hasn't been defined in the current scope
+            Token constantType = (Token) node.jjtGetChild(1).jjtAccept(this, null); //get the constant type (eg. integer)
+            Token contantValue = (Token) node.jjtGetChild(2).jjtAccept(this, null); //get the constant value
+            Symbol symbol = new Symbol(); //create a symbol for the constant
+            symbol.setName(contantName);
+            symbol.setType(constantType);
             symbol.setScope(currentScope);
             symbol.setDataType(DataType.Constant);
-            symbolTable.put(currentScope, mapTemp);
-            mapTemp.put(id.image, symbol);
+            symbolTable.put(currentScope, currentScopeSymbolTable);
+            currentScopeSymbolTable.put(contantName.image, symbol);
 
-            Token value = (Token) node.jjtGetChild(2).jjtAccept(this, null);
-            if (type.image.equals("integer") && !isInt(value.image)) {
-                errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Cannot assign boolean \"" + value.image + "\" to constant \"" + id.image + "\""));
-            } else if (type.image.equals("boolean") && !isBoolean(value.image)) {
-                errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Cannot assign number \"" + value.image + "\" to constant \"" + id.image + "\""));
+            if ((constantType.image.equals("integer") && !isInt(contantValue.image)) || (constantType.image.equals("boolean") && !isBoolean(contantValue.image))) {
+                errorList.add(new ErrorMessage(contantName.beginLine, contantName.beginColumn, "Invalid type assigned to constant \"" + contantName.image + "\""));
             } else {
-                Variable variable = new Variable(symbol.getType().toString(),value.image.toLowerCase());
-                symbol.addValue(id.image, variable);
+                Variable variable = new Variable(symbol.getType().toString(), contantValue.image.toLowerCase());
+                symbol.addValue(contantName.image, variable); //create new constant value
             }
-
-            mapTemp.put(id.image, symbol);
+            currentScopeSymbolTable.put(contantName.image, symbol);
         } else {
-            errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Constant \"" + id.image + "\" already declared in currentScope \"" + currentScope + "\""));
+            errorList.add(new ErrorMessage(contantName.beginLine, contantName.beginColumn, "Constant \"" + contantName.image + "\" already declared in currentScope \"" + currentScope + "\""));
         }
-        symbolTable.put(currentScope, mapTemp);
-
+        symbolTable.put(currentScope, currentScopeSymbolTable); //update the symbol table with the updates made to the current scope
         return null;
     }
 
     @Override
     public Object visit(ASTVarDeclaration node, Object data) {
-        Token id = (Token) node.jjtGetChild(0).jjtAccept(this, null);
-
-        HashMap<String, Symbol> mapTemp1 = symbolTable.get("Program");
-        if (mapTemp1 != null && mapTemp1.size() != 0) {
-            if (mapTemp1.get(id.image) != null && currentScope.equals("Main")) {
-                // error
-                // id already declared in currentScope Program, if currentScope is Main
-                errorList.add(new ErrorMessage(id.beginLine, id.beginColumn,"Variable \"" + id.image + "\" already declared in currentScope \"" + currentScope + "\""));
-            }
+        Token varName = (Token) node.jjtGetChild(0).jjtAccept(this, null);
+        //get the current scope map and check for existence of the var
+        HashMap<String, Symbol> currentScopeSymbolTable = symbolTable.get(currentScope);
+        if (currentScopeSymbolTable == null) {
+            currentScopeSymbolTable = new HashMap<>();
         }
-
-
-        HashMap<String, Symbol> mapTemp2 = symbolTable.get(currentScope);
-        if (mapTemp2 == null) {
-            mapTemp2 = new HashMap<>();
-        }
-
-        // if the var has not been declared already, add it to the symbolTable
-        // if the var has been declared already, then we have an error
-        Symbol idStc = mapTemp2.get(id.image);
-        if (idStc == null) {
-            Token type = (Token) node.jjtGetChild(1).jjtAccept(this, null);
+        Symbol varSymbol = currentScopeSymbolTable.get(varName.image);
+        if (varSymbol == null) {
+            Token varType = (Token) node.jjtGetChild(1).jjtAccept(this, null);
             Symbol symbol = new Symbol();
-            symbol.setName(id);
-            symbol.setType(type);
+            symbol.setName(varName);
+            symbol.setType(varType);
             symbol.setScope(currentScope);
             symbol.setDataType(DataType.Variable);
-            mapTemp2.put(id.image, symbol);
+            currentScopeSymbolTable.put(varName.image, symbol);
         } else {
-            errorList.add(new ErrorMessage(id.beginLine,id.beginColumn,"Variable \"" + id.image + "\" already declared in currentScope \"" + currentScope + "\""));
+            errorList.add(new ErrorMessage(varName.beginLine, varName.beginColumn, "Variable \"" + varName.image + "\" already declared in currentScope \"" + currentScope + "\""));
         }
-        symbolTable.put(currentScope, mapTemp2);
+        symbolTable.put(currentScope, currentScopeSymbolTable);
 
         return null;
     }
 
     @Override
     public Object visit(ASTFunctionCall node, Object data) {
-        Token id = (Token) node.jjtGetChild(0).jjtAccept(this, null);
-        String foundIn = currentScope;
-
-        // check if function(id) has been declared
-        HashMap<String, Symbol> scopeST = symbolTable.get(currentScope);
-        if (scopeST == null) {
-            scopeST = symbolTable.get("Program");
-            foundIn = "Program";
+        Token functionName = (Token) node.jjtGetChild(0).jjtAccept(this, null);
+        // check if function has been declared
+        HashMap<String, Symbol> functionSymbolTable = symbolTable.get(currentScope);
+        if (functionSymbolTable == null) {
+            functionSymbolTable = symbolTable.get(PROGRAMME);
         }
-        Symbol idStc = scopeST.get(id.image);
-        if (idStc == null) {
-            foundIn = "Program";
-            scopeST = symbolTable.get("Program");
-            idStc = scopeST.get(id.image);
+        Symbol functionSymbol = functionSymbolTable.get(functionName.image);
+        if (functionSymbol == null) {
+            functionSymbolTable = symbolTable.get(PROGRAMME);
+            functionSymbol = functionSymbolTable.get(functionName.image);
         }
-
-        if (idStc != null) {
+        if (functionSymbol != null) {
             // go to ArgList
             if (node.jjtGetNumChildren() > 1) {
                 node.jjtGetChild(1).jjtAccept(this, null);
             }
-            idStc.setIsCalled(true);
-            scopeST.put(id.image, idStc);
-            symbolTable.put(foundIn, scopeST);
+            functionSymbol.setIsCalled(true);
+            updateSymbol(functionName.image, functionSymbol);
         } else {
-            errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Variable \"" + id.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Program\""));
-
+            errorList.add(new ErrorMessage(functionName.beginLine, functionName.beginColumn, "Function \"" + functionName.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Programme\""));
         }
-
         return null;
     }
 
     @Override
     public Object visit(ASTMinus node, Object data) {
-        // check if id has been declared
-        Token id = (Token) node.jjtGetChild(0).jjtAccept(this, null);
-
+        Token variableName = (Token) node.jjtGetChild(0).jjtAccept(this, null);
         HashMap<String, Symbol> currentSymbolTable = symbolTable.get(currentScope);
-        Symbol symbol = currentSymbolTable.get(id.image);
-        if (symbol == null) {
-            currentSymbolTable = symbolTable.get("Program");
-            symbol = currentSymbolTable.get(id.image);
+        Symbol variableSymbol = currentSymbolTable.get(variableName.image);
+        if (variableSymbol == null) {
+            currentSymbolTable = symbolTable.get(PROGRAMME);
+            variableSymbol = currentSymbolTable.get(variableName.image);
         }
-
-        if (symbol == null) {
-            // error if still not declared
-            errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Variable \"" + id.image + "\" not declared in any scope"));
-        } else if (symbol.getValues().size() == 0) {
-            if (currentScope.equals("Program") || currentScope.equals("Main")) {
+        if (variableSymbol == null) {
+            // If we're still not finding it then there is a problem
+            errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Variable \"" + variableName.image + "\" not declared in any scope"));
+        } else if (variableSymbol.getValues().size() == 0) {
+            if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
                 // error if var has no value
-                errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Variable \"" + id.image + "\" has no value in currentScope \"" + currentScope + "\""));
+                errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Variable \"" + variableName.image + "\" has no value in currentScope \"" + currentScope + "\""));
             }
-        } else if (!symbol.getType().image.equals("integer")) {
-            errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Cannot create negative value from " + symbol.getDataType() + " \"" + id.image + "\". Not of type integer"));
+        } else if (!variableSymbol.getType().image.equals("integer")) {
+            errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Cannot create negative value from " + variableSymbol.getDataType() + " \"" + variableName.image + "\". Not of type integer"));
         } else {
-            Variable variable = new Variable(symbol.getType().toString(),"-" +id);
-            symbol.addValue(id.image, variable);
+            Variable variable = new Variable(variableSymbol.getType().toString(), "-" + variableName); //Assign the minus sign the the value here
+            variableSymbol.addValue(variableName.image, variable);
             // set isRead value
-            symbol.setIsRead(true);
-            symbol.setIsCalled(true);
-            updateScope(id.image,symbol);
+            variableSymbol.setIsRead(true);
+            variableSymbol.setIsCalled(true);
+            updateSymbol(variableName.image, variableSymbol);
         }
-
         return null;
     }
 
     @Override
     public Object visit(ASTArgumentList node, Object data) {
-        Token funcId = (Token) node.jjtGetParent().jjtGetChild(0).jjtAccept(this, null);
-
-        HashMap<String, Symbol> mapTemp = symbolTable.get("Program");
+        Token functionName = (Token) node.jjtGetParent().jjtGetChild(0).jjtAccept(this, null);
+        HashMap<String, Symbol> mapTemp = symbolTable.get(PROGRAMME);
         if (mapTemp != null) {
-            Symbol funcStc = mapTemp.get(funcId.image);
-            if (funcStc == null) {
+            Symbol functionSymbol = mapTemp.get(functionName.image);
+            if (functionSymbol == null) {
                 // error, no such function
-                errorList.add(new ErrorMessage(funcId.beginLine, funcId.beginColumn, "No such function called \"" + funcId.image + "\""));
+                errorList.add(new ErrorMessage(functionName.beginLine, functionName.beginColumn, "No such function called \"" + functionName.image + "\""));
             } else {
                 // check for correct number of Args
-                int numArgsDeclared = funcStc.getNumArgs();
+                int numArgsDeclared = functionSymbol.getNumArgs();
                 int numArgsPassed = node.jjtGetNumChildren();
                 if (numArgsDeclared != numArgsPassed) {
-                    // error, incorrect num of args
-
-                    errorList.add(new ErrorMessage(funcId.beginLine, funcId.beginColumn, "Function \"" + funcId.image + "\" has invalid number of arguments. called with " + numArgsPassed + " argument(s), should have " + numArgsDeclared));
-
+                    errorList.add(new ErrorMessage(functionName.beginLine, functionName.beginColumn, "Function \"" + functionName.image + "\" has invalid number of arguments. called with " + numArgsPassed + " argument(s), should have " + numArgsDeclared));
                 } else if (numArgsDeclared > 0) {
                     int i = 0;
-                    for (String key : funcStc.getValues().keySet()) {
-                        String type = funcStc.getValues().get(key).get(0).getType();
-                        Token argi = (Token) node.jjtGetChild(i).jjtGetChild(0).jjtAccept(this, null);
-                        Symbol argiStc = mapTemp.get(argi.image);
-                        if (argiStc == null) {
+                    //Loop through the functions arguments and evaluate them
+                    for (String key : functionSymbol.getValues().keySet()) {
+                        String type = functionSymbol.getValues().get(key).get(0).getType();
+                        Token argumentName = (Token) node.jjtGetChild(i).jjtGetChild(0).jjtAccept(this, null);
+                        Symbol argumentSymbol = mapTemp.get(argumentName.image);
+                        if (argumentSymbol == null) {
                             mapTemp = symbolTable.get(currentScope);
-                            argiStc = mapTemp.get(argi.image);
+                            argumentSymbol = mapTemp.get(argumentName.image);
                         }
-                        if (!argiStc.getType().image.equals(type)) {
-                            // error
-                            // argument in function call is incorrect type
-                            errorList.add(new ErrorMessage(argi.beginLine, argi.beginColumn, "\"" + argi.image + "\" in function call for \"" + funcId.image + "\" is of incorrect type"));
+                        if (!argumentSymbol.getType().image.equals(type)) {
+                            errorList.add(new ErrorMessage(argumentName.beginLine, argumentName.beginColumn, "\"" + argumentName.image + "\" in function call for \"" + functionName.image + "\" is the wrong type"));
                         }
                         //if argument is variable then it is accessed
-                        if (argiStc.getDataType() != DataType.Unknown) {
-                            argiStc.setIsRead(true);
-                            updateScope(argi.image, argiStc);
+                        if (argumentSymbol.getDataType() != DataType.Unknown) {
+                            argumentSymbol.setIsRead(true);
+                            updateSymbol(argumentName.image, argumentSymbol);
                         }
                         i++;
                     }
                 }
             }
         }
-
         node.childrenAccept(this, data);
-
         return null;
     }
 
     @Override
     public Object visit(ASTArg node, Object data) {
-        // Check if Arg has been declared
-        Token arg = (Token) node.jjtGetChild(0).jjtAccept(this, null);
-        String foundIn = currentScope;
-
-        HashMap<String, Symbol> mapTemp = symbolTable.get(currentScope);
-        Symbol argStc = mapTemp.get(arg.image);
-        if (argStc == null) {
-            mapTemp = symbolTable.get("Program");
-            foundIn = "Program";
-            argStc = mapTemp.get(arg.image);
+        Token argumentName = (Token) node.jjtGetChild(0).jjtAccept(this, null);
+        HashMap<String, Symbol> currentSymbolTable = symbolTable.get(currentScope);
+        Symbol argumentSymbol = currentSymbolTable.get(argumentName.image);
+        if (argumentSymbol == null) {
+            currentSymbolTable = symbolTable.get(PROGRAMME);
+            argumentSymbol = currentSymbolTable.get(argumentName.image);
         }
-
-        if (argStc == null) {
-            errorList.add(new ErrorMessage(arg.beginLine,arg.beginColumn,"Variable or Const \"" + arg.image + "\" has not been declared in currentScope \"" + currentScope + "\""));
-        } else if (argStc.getValues().size() == 0) {
-            if (currentScope.equals("Program") || currentScope.equals("Main")) {
-                errorList.add(new ErrorMessage(arg.beginLine,arg.beginColumn,"Variable \"" + arg.image + "\" has been declared in currentScope \"" + currentScope + "\", but has no value"));
+        if (argumentSymbol == null) {
+            errorList.add(new ErrorMessage(argumentName.beginLine, argumentName.beginColumn, "Variable or Const \"" + argumentName.image + "\" has not been declared in currentScope \"" + currentScope + "\""));
+        } else if (argumentSymbol.getValues().size() == 0) {
+            if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
+                errorList.add(new ErrorMessage(argumentName.beginLine, argumentName.beginColumn, "Variable \"" + argumentName.image + "\" has been declared in currentScope \"" + currentScope + "\", but has no value"));
             }
         } else {
-            argStc.setIsRead(true);
-            mapTemp.put(arg.image, argStc);
-            symbolTable.put(foundIn, mapTemp);
+            argumentSymbol.setIsRead(true);
+            updateSymbol(argumentName.image, argumentSymbol);
         }
-
         return null;
     }
 
@@ -535,37 +456,37 @@ public class Visitor implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTEqual node, Object data) {
-        isValidBooleanOperation(node,data);
+        isValidBooleanOperation(node, data);
         return null;
     }
 
     @Override
     public Object visit(ASTNotEqual node, Object data) {
-        isValidBooleanOperation(node,data);
+        isValidBooleanOperation(node, data);
         return null;
     }
 
     @Override
     public Object visit(ASTLessThan node, Object data) {
-        isValidBooleanOperation(node,data);
+        isValidBooleanOperation(node, data);
         return null;
     }
 
     @Override
     public Object visit(ASTLessThanEqual node, Object data) {
-        isValidBooleanOperation(node,data);
+        isValidBooleanOperation(node, data);
         return null;
     }
 
     @Override
     public Object visit(ASTGreaterThan node, Object data) {
-        isValidBooleanOperation(node,data);
+        isValidBooleanOperation(node, data);
         return null;
     }
 
     @Override
     public Object visit(ASTGreaterThanEqual node, Object data) {
-        isValidBooleanOperation(node,data);
+        isValidBooleanOperation(node, data);
         return null;
     }
 
@@ -586,213 +507,122 @@ public class Visitor implements CCALParserVisitor {
         return node.jjtGetValue();
     }
 
-    //Will throw appropriate errors and return back if it's something to recurse into
-    boolean isValidArithmetic(Node node, Token token) {
-        if (node instanceof ASTVariable) {
-            String foundIn1 = currentScope;
-
-            HashMap<String, Symbol> mapTemp = symbolTable.get(currentScope);
-            Symbol child1Stc = mapTemp.get(token.image);
-            if (child1Stc == null) {
-                mapTemp = symbolTable.get("Program");
-                foundIn1 = "Program";
-                child1Stc = mapTemp.get(token.image);
-            }
-            if (child1Stc == null) {
-                // error if var or const has not been declared before
-                errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Variable or Const \"" + token.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Program\""));
-                return false;
-            } else if (child1Stc.getValues().size() == 0) {
-                if (currentScope.equals("Program") || currentScope.equals("Main")) {
-                    // error if var has no value
-                    errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Variable \"" + token.image + "\" has no value in currentScope \"" + currentScope + "\""));
-                    return false;
-                }
-            } else if (!child1Stc.getType().image.equals("integer")) {
-                // var / const has been declared and has value
-                // error if var is of type boolean
-                errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Cannot add variable \"" + token.image + "\". Not of type Number"));
-                return false;
-            } else {
-                // set isRead value
-                child1Stc.setIsRead(true);
-                mapTemp.put(token.image, child1Stc);
-                symbolTable.put(foundIn1, mapTemp);
-            }
-        } else if (node instanceof ASTDigit) {
-            return false;
-        } else if (node instanceof ASTBoolean) {
-            // error if first child node is a boolean
-            errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Cannot add value \"" + token.image + "\" (type boolean)"));
-            return false;
-        }
-        return true;
-    }
-
     @Override
     public Object visit(ASTAdd node, Object data) {
-        Token child1 = (Token) node.jjtGetChild(0).jjtAccept(this, null);
-        Node node1 = node.jjtGetChild(0);
-        if (isValidArithmetic(node1, child1)) {
-            node.childrenAccept(this, data);
-        }
-
-        Token child2 = (Token) node.jjtGetChild(1).jjtAccept(this, null);
-        Node node2 = node.jjtGetChild(1);
-        if (isValidArithmetic(node2, child2)) {
-            node.childrenAccept(this, data);
-        }
+        performArithmatic(node, data);
         return null;
     }
 
     @Override
     public Object visit(ASTSubtract node, Object data) {
-        Token child1 = (Token) node.jjtGetChild(0).jjtAccept(this, null);
-        Node node1 = node.jjtGetChild(0);
-        if (isValidArithmetic(node1, child1)) {
-            node.childrenAccept(this, data);
-        }
-
-        Token child2 = (Token) node.jjtGetChild(1).jjtAccept(this, null);
-        Node node2 = node.jjtGetChild(1);
-        if (isValidArithmetic(node2, child2)) {
-            node.childrenAccept(this, data);
-        }
-
+        performArithmatic(node, data);
         return null;
     }
 
     @Override
     public Object visit(ASTAssignment node, Object data) {
-        HashMap<String, Symbol> mapTemp = symbolTable.get(currentScope);
-        if (mapTemp == null) {
-            mapTemp = new HashMap<String, Symbol>();
+        HashMap<String, Symbol> currentScopeSymbolTable = symbolTable.get(currentScope);
+        if (currentScopeSymbolTable == null) {
+            currentScopeSymbolTable = new HashMap<>();
         }
-
-        Token id = (Token) node.jjtGetChild(0).jjtAccept(this, null);
-
-        // get stc from being declared in this currentScope
-        Symbol idStc = mapTemp.get(id.image);
-        // if not declared here, check if delcared in Program currentScope (Global variable)
-        if (idStc == null) {
-            idStc = symbolTable.get("Program").get(id.image);
+        Token variableName = (Token) node.jjtGetChild(0).jjtAccept(this, null);
+        Symbol variableSymbol = currentScopeSymbolTable.get(variableName.image);
+        if (variableSymbol == null) { //if it's not in the current scope check the programmes scope
+            variableSymbol = symbolTable.get(PROGRAMME).get(variableName.image);
         }
-
-        if (idStc != null) {
-            Token value = (Token) node.jjtGetChild(1).jjtAccept(this, null);
-            Node valueNode = node.jjtGetChild(1);
-
-            if (valueNode instanceof ASTVariable) {
-                Symbol valueStc = symbolTable.get(currentScope).get(value.image);
-                if (valueStc == null) {
-                    valueStc = symbolTable.get("Program").get(value.image);
+        if (variableSymbol != null) { //If it's in the main programmes scope after the last check we're ok
+            Token assignedValue = (Token) node.jjtGetChild(1).jjtAccept(this, null);
+            Node assignedNode = node.jjtGetChild(1);
+            if (assignedNode instanceof ASTVariable) {
+                Symbol assignedSymbol = symbolTable.get(currentScope).get(assignedValue.image);
+                if (assignedSymbol == null) {
+                    assignedSymbol = symbolTable.get(PROGRAMME).get(assignedValue.image);
                 }
-                if (valueStc == null) {
-                    // error
-                    // valueStc is not declared
-                    errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, idStc.getDataType() + " \"" + value.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Program\""));
-                } else if (!idStc.getType().image.equals(valueStc.getType().image)) {
-                    // error
-                    // id and value not of same type
-                    errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "\"" + id.image + "\" and \"" + value.image + "\" are not of same type"));
-                } else if (idStc.getValues().size() == 0) {
-                    // if its initial value has already been stored, leave it
-                    idStc.setIsRead(true);
-                    Variable variable = new Variable(idStc.getType().toString(),value.toString());
-                    idStc.addValue(id.image, variable);
-                    mapTemp.put(id.image, idStc);
-                    symbolTable.put(currentScope, mapTemp);
-
-                    valueStc.setIsRead(true);
-                    updateScope(value.image, valueStc);
+                if (assignedSymbol == null) {
+                    errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, variableSymbol.getDataType() + " \"" + assignedValue.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Programme\""));
+                } else if (!variableSymbol.getType().image.equals(assignedSymbol.getType().image)) {
+                    errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "\"" + variableName.image + "\" and \"" + assignedValue.image + "\" are not of same type"));
+                } else if (variableSymbol.getValues().size() == 0) {
+                    variableSymbol.setIsRead(true);
+                    Variable variable = new Variable(variableSymbol.getType().toString(), assignedValue.toString());
+                    variableSymbol.addValue(variableName.image, variable);
+                    currentScopeSymbolTable.put(variableName.image, variableSymbol);
+                    symbolTable.put(currentScope, currentScopeSymbolTable);
+                    assignedSymbol.setIsRead(true);
+                    updateSymbol(assignedValue.image, assignedSymbol);
                 } else {
-                    valueStc.setIsRead(true);
-                    valueStc.setIsCalled(true);
-                    if (valueStc.getScope().equals(currentScope)) {
-                        mapTemp.put(value.image, valueStc);
-                        symbolTable.put(currentScope, mapTemp);
-                    } else {
-                        HashMap<String, Symbol> outerScope = symbolTable.get(valueStc.getScope());
-                        outerScope.put(value.image, valueStc);
-                        symbolTable.put(valueStc.getScope(), outerScope);
-                    }
+                    assignedSymbol.setIsRead(true);
+                    assignedSymbol.setIsCalled(true);
+                    updateSymbol(assignedValue.image, assignedSymbol);
                 }
-            } else if (valueNode instanceof ASTDigit) {
-                if (!idStc.getType().image.equals("integer")) {
-                    // error
-                    // if attempting to assign number to id not of type number
-                    errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Cannot assign type number to \"" + id.image + "\""));
-                } else if (idStc.getValues().size() == 0) {
+            } else if (assignedNode instanceof ASTDigit) {
+                if (!variableSymbol.getType().image.equals("integer")) {
+                    errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Cannot assign type number to \"" + variableName.image + "\""));
+                } else if (variableSymbol.getValues().size() == 0) {
                     // if its initial value has already been stored, leave it
-                    Variable variable = new Variable(idStc.getType().toString(),value.toString());
-                    idStc.addValue(id.image, variable);
-                    idStc.setIsCalled(true);
-                    updateScope(id.image, idStc);
+                    Variable variable = new Variable(variableSymbol.getType().toString(), assignedValue.toString());
+                    variableSymbol.addValue(variableName.image, variable);
+                    variableSymbol.setIsCalled(true);
+                    updateSymbol(variableName.image, variableSymbol);
                 }
-            } else if (valueNode instanceof ASTBoolean) {
-                if (!idStc.getType().image.equals("boolean")) {
-                    // error
-                    // if attempting to assign boolean to id not of type boolean
-                    errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Cannot assign type boolean to \"" + id.image + "\""));
+            } else if (assignedNode instanceof ASTBoolean) {
+                if (!variableSymbol.getType().image.equals("boolean")) {
+                    errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Cannot assign type boolean to \"" + variableName.image + "\""));
                 }
                 // if its initial value has already been stored, leave it
-                Variable variable = new Variable(idStc.getType().toString(),value.toString());
-                idStc.addValue(id.image, variable);
-                mapTemp.put(id.image, idStc);
-                symbolTable.put(currentScope, mapTemp);
-            } else if (valueNode instanceof ASTFunctionCall ||
-                    valueNode instanceof ASTPos ||
-                    valueNode instanceof ASTMinus) {
-                Token subChild = (Token) valueNode.jjtGetChild(0).jjtAccept(this, null);
+                Variable variable = new Variable(variableSymbol.getType().toString(), assignedValue.toString());
+                variableSymbol.addValue(variableName.image, variable);
+                currentScopeSymbolTable.put(variableName.image, variableSymbol);
+                symbolTable.put(currentScope, currentScopeSymbolTable);
+            } else if (assignedNode instanceof ASTFunctionCall ||
+                    assignedNode instanceof ASTPos ||
+                    assignedNode instanceof ASTMinus) {
+                Token functionToken = (Token) assignedNode.jjtGetChild(0).jjtAccept(this, null);
                 // if its initial value has already been stored, leave it
-                Variable variable = new Variable(idStc.getType().toString(),subChild.toString());
-                idStc.addValue(subChild.image, variable);
-                mapTemp.put(id.image, idStc);
-                symbolTable.put(currentScope, mapTemp);
-            } else if (valueNode instanceof ASTAdd ||
-                    valueNode instanceof ASTSubtract) {
-                Token subChild1 = (Token) valueNode.jjtGetChild(0).jjtAccept(this, null);
-                Token subChild2 = (Token) valueNode.jjtGetChild(1).jjtAccept(this, null);
+                Variable variable = new Variable(variableSymbol.getType().toString(), functionToken.toString());
+                variableSymbol.addValue(functionToken.image, variable);
+                currentScopeSymbolTable.put(variableName.image, variableSymbol);
+                symbolTable.put(currentScope, currentScopeSymbolTable);
+            } else if (assignedNode instanceof ASTAdd || assignedNode instanceof ASTSubtract) {
+                Token leftToken = (Token) assignedNode.jjtGetChild(0).jjtAccept(this, null);
+                Token rightToken = (Token) assignedNode.jjtGetChild(1).jjtAccept(this, null);
                 // if its initial value has already been stored, leave it
                 String operator = "-";
-                if(valueNode instanceof ASTAdd)
+                if (assignedNode instanceof ASTAdd)
                     operator = "+";
-                Variable variable1 = new Variable(idStc.getType().toString(),subChild1.toString() + operator + subChild2.toString());
-                idStc.addValue(subChild1.image, variable1);
-                mapTemp.put(id.image, idStc);
-                symbolTable.put(currentScope, mapTemp);
-                
+                Variable variable1 = new Variable(variableSymbol.getType().toString(), leftToken.toString() + operator + rightToken.toString());
+                variableSymbol.addValue(leftToken.image, variable1);
+                currentScopeSymbolTable.put(variableName.image, variableSymbol);
+                symbolTable.put(currentScope, currentScopeSymbolTable);
+
                 //update tokens if variables
-                if(valueNode.jjtGetChild(0) instanceof  ASTVariable){
-                    setAsReadAndCalled(subChild1);
+                if (assignedNode.jjtGetChild(0) instanceof ASTVariable) {
+                    setAsReadAndCalled(leftToken);
                 }
-                if(valueNode.jjtGetChild(1) instanceof  ASTVariable){
-                    setAsReadAndCalled(subChild2);
+                if (assignedNode.jjtGetChild(1) instanceof ASTVariable) {
+                    setAsReadAndCalled(rightToken);
                 }
             } else {
                 node.childrenAccept(this, data);
             }
         } else {
-            // error
-            // still not declared
-            errorList.add(new ErrorMessage(id.beginLine, id.beginColumn, "Variable \"" + id.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Program\""));
+            errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Variable \"" + variableName.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Programme\""));
         }
-
-
         return null;
     }
 
-    private void setAsReadAndCalled(Token token){
-        Symbol rightSymbol =  symbolTable.get(currentScope).get(token.image);
-        if(rightSymbol == null){
-            rightSymbol =  symbolTable.get("Program").get(token.image);
+    private void setAsReadAndCalled(Token token) {
+        Symbol rightSymbol = symbolTable.get(currentScope).get(token.image);
+        if (rightSymbol == null) {
+            rightSymbol = symbolTable.get(PROGRAMME).get(token.image);
         }
         rightSymbol.setIsRead(true);
         rightSymbol.setIsCalled(true);
-        updateScope(token.image,rightSymbol);
+        updateSymbol(token.image, rightSymbol);
     }
 
-    private void updateScope(String symbolName, Symbol symbol) {
+    //Place the symbol into the correct scope
+    private void updateSymbol(String symbolName, Symbol symbol) {
         HashMap<String, Symbol> tempMap;
         if (symbol.getScope().equals(currentScope)) {
             tempMap = symbolTable.get(currentScope);
@@ -843,13 +673,13 @@ public class Visitor implements CCALParserVisitor {
         Node leftNode = parentNode.jjtGetChild(0);
         Token leftToken = (Token) parentNode.jjtGetChild(0).jjtAccept(this, null);
         if (checkBooleanComparison(leftNode, leftToken)) {
-            evaluateChildCondition(parentNode,data);
+            evaluateChildCondition(parentNode, data);
         }
 
         Node rightNode = parentNode.jjtGetChild(1);
         Token rightToken = (Token) parentNode.jjtGetChild(1).jjtAccept(this, null);
         if (checkBooleanComparison(rightNode, rightToken)) {
-            evaluateChildCondition(parentNode,data);
+            evaluateChildCondition(parentNode, data);
         }
     }
 
@@ -858,13 +688,13 @@ public class Visitor implements CCALParserVisitor {
         if (node instanceof ASTVariable) {
             Symbol symbol = symbolTable.get(currentScope).get(token.image);
             if (symbol == null) {
-                symbol = symbolTable.get("Program").get(token.image);
+                symbol = symbolTable.get(PROGRAMME).get(token.image);
             }
             if (symbol == null) {
                 errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Variable or Const \"" + token.image + "\" not declared in  any scope \""));
                 return false;
             } else if (symbol.getValues().size() == 0) {
-                if (currentScope.equals("Program") || currentScope.equals("Main")) {
+                if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
                     // error if var has no value
                     errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Variable \"" + token.image + "\" has no value in scope \"" + currentScope + "\""));
                     return false;
@@ -891,7 +721,7 @@ public class Visitor implements CCALParserVisitor {
             // check if var or const has been declared before
             Symbol leftSymbol = symbolTable.get(currentScope).get(leftToken.image);
             if (leftSymbol == null) {
-                leftSymbol = symbolTable.get("Program").get(leftToken.image);
+                leftSymbol = symbolTable.get(PROGRAMME).get(leftToken.image);
             }
             if (leftSymbol == null) {
                 // error if var or const has not been declared before
@@ -899,10 +729,10 @@ public class Visitor implements CCALParserVisitor {
             } else {
                 leftSymbolType = leftSymbol.getType().image;
                 leftSymbol.setIsRead(true);
-                updateScope(leftToken.image,leftSymbol);
+                updateSymbol(leftToken.image, leftSymbol);
 
                 if (leftSymbol.getValues().size() == 0) {
-                    if (currentScope.equals("Program") || currentScope.equals("Main")) {
+                    if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
                         // error if var has no value
                         errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "Variable \"" + leftToken.image + "\" has no value in scope \"" + currentScope + "\""));
                     }
@@ -920,18 +750,18 @@ public class Visitor implements CCALParserVisitor {
             // check if var or const has been declared before
             Symbol rightSymbol = symbolTable.get(currentScope).get(rightToken.image);
             if (rightSymbol == null) {
-                rightSymbol = symbolTable.get("Program").get(rightToken.image);
+                rightSymbol = symbolTable.get(PROGRAMME).get(rightToken.image);
             }
             if (rightSymbol == null) {
                 // error if var or const has not been declared before
                 errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "Variable or Constant \"" + rightToken.image + "\" not declared in any scope \""));
             } else if (rightSymbol.getValues().size() == 0) {
-                if (currentScope.equals("Program") || currentScope.equals("Main")) {
+                if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
                     // error if var has no value
                     errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "Variable \"" + rightToken.image + "\" has no value in current scope \"" + currentScope + "\""));
                 }
                 rightSymbol.setIsRead(true);
-                updateScope(leftToken.image,rightSymbol);
+                updateSymbol(leftToken.image, rightSymbol);
             } else if (!rightSymbol.getType().image.equals(leftSymbolType)) {
                 // error if is not a boolean
                 errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, rightSymbol.getDataType() + " \"" + rightToken.image + "\" is not of type " + leftSymbolType));
@@ -941,10 +771,10 @@ public class Visitor implements CCALParserVisitor {
             // error if number
             errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "Invalid boolean using \"" + rightToken.image));
         }
-        evaluateChildCondition(parentNode,data);
+        evaluateChildCondition(parentNode, data);
     }
 
-    private void evaluateChildCondition(Node parentNode, Object data){
+    private void evaluateChildCondition(Node parentNode, Object data) {
         //Allow for inner evaluation of child comparisons
         if (parentNode instanceof ASTAnd) {
             ASTAnd node = (ASTAnd) parentNode;
@@ -974,6 +804,73 @@ public class Visitor implements CCALParserVisitor {
             ASTNot node = (ASTNot) parentNode;
             node.childrenAccept(this, data);
         }
+    }
+
+    private void performArithmatic(Node parentNode, Object data) {
+        Token leftToken = (Token) parentNode.jjtGetChild(0).jjtAccept(this, null);
+        Node leftNode = parentNode.jjtGetChild(0);
+        if (isValidArithmetic(leftNode, leftToken)) {
+            evaluateArithmaticChildren(parentNode, data);
+        }
+
+        Token rightToken = (Token) parentNode.jjtGetChild(1).jjtAccept(this, null);
+        Node rightNode = parentNode.jjtGetChild(1);
+        if (isValidArithmetic(rightNode, rightToken)) {
+            evaluateArithmaticChildren(parentNode, data);
+        }
+    }
+
+    private void evaluateArithmaticChildren(Node parentNode, Object data) {
+        if (parentNode instanceof ASTAdd) {
+            ASTAdd node = (ASTAdd) parentNode;
+            node.childrenAccept(this, data);
+        } else if (parentNode instanceof ASTSubtract) {
+            ASTSubtract node = (ASTSubtract) parentNode;
+            node.childrenAccept(this, data);
+        }
+    }
+
+    //Will throw appropriate errors and return back if it's something to recurse into
+    private boolean isValidArithmetic(Node node, Token token) {
+        if (node instanceof ASTVariable) {
+            String foundIn1 = currentScope;
+
+            HashMap<String, Symbol> mapTemp = symbolTable.get(currentScope);
+            Symbol child1Stc = mapTemp.get(token.image);
+            if (child1Stc == null) {
+                mapTemp = symbolTable.get(PROGRAMME);
+                foundIn1 = PROGRAMME;
+                child1Stc = mapTemp.get(token.image);
+            }
+            if (child1Stc == null) {
+                // error if var or const has not been declared before
+                errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Variable or Const \"" + token.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Programme\""));
+                return false;
+            } else if (child1Stc.getValues().size() == 0) {
+                if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
+                    // error if var has no value
+                    errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Variable \"" + token.image + "\" has no value in currentScope \"" + currentScope + "\""));
+                    return false;
+                }
+            } else if (!child1Stc.getType().image.equals("integer")) {
+                // var / const has been declared and has value
+                // error if var is of type boolean
+                errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Cannot add variable \"" + token.image + "\". Not of type Number"));
+                return false;
+            } else {
+                // set isRead value
+                child1Stc.setIsRead(true);
+                mapTemp.put(token.image, child1Stc);
+                symbolTable.put(foundIn1, mapTemp);
+            }
+        } else if (node instanceof ASTDigit) {
+            return false;
+        } else if (node instanceof ASTBoolean) {
+            // error if first child node is a boolean
+            errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Cannot add value \"" + token.image + "\" (type boolean)"));
+            return false;
+        }
+        return true;
     }
 
     private class ErrorMessage {

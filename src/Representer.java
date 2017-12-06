@@ -191,9 +191,9 @@ public class Representer implements CCALParserVisitor {
         }
 
         ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = "~";
-        ac.addr2 = (String) node.jjtGetChild(0).jjtAccept(this, null);
-        ac.addr3 = (String) node.jjtGetChild(1).jjtAccept(this, null);
+        ac.addr1 = "~" + getBooleanOperator(node.jjtGetChild(0));
+        ac.addr2 = (String) node.jjtGetChild(0).jjtGetChild(0).jjtAccept(this, null);
+        ac.addr3 = (String) node.jjtGetChild(0).jjtGetChild(1).jjtAccept(this, null);
 
         allAc.add(ac);
         addrCode.put(label, allAc);
@@ -460,5 +460,28 @@ public class Representer implements CCALParserVisitor {
         addrCode.put(label, allAc);
 
         return null;
+    }
+
+    public String getBooleanOperator(Node node){
+        if (node instanceof ASTAnd) {
+            return "&&";
+        } else if (node instanceof ASTOr) {
+            return "||";
+        } else if (node instanceof ASTGreaterThan) {
+            return ">";
+        } else if (node instanceof ASTGreaterThanEqual) {
+            return ">=";
+        } else if (node instanceof ASTLessThan) {
+            return "<";
+        } else if (node instanceof ASTLessThanEqual) {
+            return "<=";
+        } else if (node instanceof ASTEqual) {
+            return "==";
+        } else if (node instanceof ASTNotEqual) {
+            return "!=";
+        } else if (node instanceof ASTNot) {
+            return "~";
+        }
+        return "";
     }
 }

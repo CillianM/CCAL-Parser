@@ -2,11 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="226487bd-0f83-4444-80f8-483f5308fba1" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ThreeAddressCode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Representer.java" afterPath="$PROJECT_DIR$/src/Representer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ThreeAddressCode.java" afterPath="$PROJECT_DIR$/src/ThreeAddressCode.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Visitor.java" afterPath="$PROJECT_DIR$/src/Visitor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test3.ccal" afterPath="$PROJECT_DIR$/test3.ccal" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -20,8 +20,8 @@
       <file leaf-file-name="ccal_parser.jjt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ccal_parser.jjt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2567">
-              <caret line="151" column="59" lean-forward="false" selection-start-line="151" selection-start-column="55" selection-end-line="151" selection-end-column="59" />
+            <state relative-caret-position="233">
+              <caret line="312" column="0" lean-forward="false" selection-start-line="312" selection-start-column="0" selection-end-line="316" selection-end-column="1" />
               <folding />
             </state>
           </provider>
@@ -30,22 +30,51 @@
       <file leaf-file-name="Visitor.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Visitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="214">
-              <caret line="822" column="30" lean-forward="false" selection-start-line="822" selection-start-column="12" selection-end-line="822" selection-end-column="30" />
+            <state relative-caret-position="-1504">
+              <caret line="529" column="99" lean-forward="false" selection-start-line="529" selection-start-column="99" selection-end-line="529" selection-end-column="99" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="method#visit#1;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#2;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#3;class#Visitor#0" expanded="false" />
                 <element signature="method#visit#4;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#5;class#Visitor#0" expanded="false" />
                 <element signature="method#visit#6;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#7;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#8;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#9;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#10;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#11;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#12;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#14;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#15;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#16;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#17;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#18;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#19;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#20;class#Visitor#0" expanded="false" />
                 <element signature="method#visit#21;class#Visitor#0" expanded="false" />
-                <element signature="method#isValidArithmetic#0;class#Visitor#0" expanded="false" />
-                <element signature="method#visit#35;class#Visitor#0" expanded="false" />
+                <element signature="e#21825#21826#0" expanded="true" />
+                <element signature="e#21866#21867#0" expanded="true" />
+                <element signature="e#21935#21936#0" expanded="true" />
+                <element signature="e#21976#21977#0" expanded="true" />
+                <element signature="e#22049#22050#0" expanded="true" />
+                <element signature="e#22090#22091#0" expanded="true" />
+                <element signature="e#23318#23319#0" expanded="true" />
+                <element signature="e#23359#23360#0" expanded="true" />
+                <element signature="method#setAsReadAndCalled#0;class#Visitor#0" expanded="false" />
+                <element signature="method#updateSymbol#0;class#Visitor#0" expanded="false" />
                 <element signature="method#isSematicError#0;class#Visitor#0" expanded="false" />
+                <element signature="method#printErrorList#0;class#Visitor#0" expanded="false" />
                 <element signature="method#isInt#0;class#Visitor#0" expanded="false" />
                 <element signature="method#isValidBooleanComparison#0;class#Visitor#0" expanded="false" />
                 <element signature="method#checkBooleanComparison#0;class#Visitor#0" expanded="false" />
                 <element signature="method#isValidBooleanOperation#0;class#Visitor#0" expanded="false" />
                 <element signature="method#evaluateChildCondition#0;class#Visitor#0" expanded="false" />
-                <element signature="class#ErrorMessage#0;class#Visitor#0" expanded="false" />
+                <element signature="method#performArithmatic#0;class#Visitor#0" expanded="false" />
+                <element signature="method#evaluateArithmaticChildren#0;class#Visitor#0" expanded="false" />
+                <element signature="method#isValidArithmetic#0;class#Visitor#0" expanded="false" />
+                <marker date="1512598294258" expanded="false" signature="42731:43206" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -54,14 +83,9 @@
       <file leaf-file-name="ThreeAddressCode.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ThreeAddressCode.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="18" lean-forward="true" selection-start-line="0" selection-start-column="18" selection-end-line="0" selection-end-column="18" />
-              <folding>
-                <element signature="e#241#242#0" expanded="true" />
-                <element signature="e#267#268#0" expanded="true" />
-                <element signature="e#689#690#0" expanded="true" />
-                <element signature="e#759#760#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="17">
+              <caret line="1" column="10" lean-forward="false" selection-start-line="1" selection-start-column="4" selection-end-line="1" selection-end-column="10" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -69,78 +93,17 @@
       <file leaf-file-name="Representer.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Representer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="368">
-              <caret line="459" column="0" lean-forward="false" selection-start-line="459" selection-start-column="0" selection-end-line="459" selection-end-column="0" />
+            <state relative-caret-position="262">
+              <caret line="197" column="0" lean-forward="false" selection-start-line="197" selection-start-column="0" selection-end-line="197" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#visit#1;class#Representer#0" expanded="false" />
                 <element signature="method#visit#2;class#Representer#0" expanded="false" />
                 <element signature="method#visit#3;class#Representer#0" expanded="false" />
                 <element signature="method#visit#4;class#Representer#0" expanded="false" />
-                <element signature="e#2705#2706#0" expanded="true" />
-                <element signature="e#2732#2733#0" expanded="true" />
-                <element signature="e#2805#2806#0" expanded="true" />
-                <element signature="e#2832#2833#0" expanded="true" />
-                <element signature="e#2901#2902#0" expanded="true" />
-                <element signature="e#2928#2929#0" expanded="true" />
                 <element signature="method#visit#10;class#Representer#0" expanded="false" />
-                <element signature="e#3756#3757#0" expanded="true" />
-                <element signature="e#3783#3784#0" expanded="true" />
-                <element signature="e#6131#6132#0" expanded="true" />
-                <element signature="e#6158#6159#0" expanded="true" />
-                <element signature="e#6234#6235#0" expanded="true" />
-                <element signature="e#6261#6262#0" expanded="true" />
-                <element signature="e#6328#6329#0" expanded="true" />
-                <element signature="e#6355#6356#0" expanded="true" />
-                <element signature="e#6427#6428#0" expanded="true" />
-                <element signature="e#6484#6485#0" expanded="true" />
-                <element signature="e#6553#6554#0" expanded="true" />
-                <element signature="e#6610#6611#0" expanded="true" />
-                <element signature="e#6683#6684#0" expanded="true" />
-                <element signature="e#6740#6741#0" expanded="true" />
-                <element signature="e#11003#11004#0" expanded="true" />
-                <element signature="e#11060#11061#0" expanded="true" />
+                <element signature="method#visit#18;class#Representer#0" expanded="false" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ASTFunctionCall.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/ASTFunctionCall.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DataType.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/DataType.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="12" lean-forward="false" selection-start-line="0" selection-start-column="12" selection-end-line="0" selection-end-column="12" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test4.ccal" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test4.ccal">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="427">
-              <caret line="27" column="9" lean-forward="false" selection-start-line="27" selection-start-column="9" selection-end-line="27" selection-end-column="9" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="11" column="22" lean-forward="false" selection-start-line="11" selection-start-column="22" selection-end-line="11" selection-end-column="22" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -148,8 +111,8 @@
       <file leaf-file-name="test3.ccal" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test3.ccal">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="16" column="7" lean-forward="false" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="7" />
+            <state relative-caret-position="238">
+              <caret line="14" column="7" lean-forward="false" selection-start-line="14" selection-start-column="7" selection-end-line="14" selection-end-column="7" />
               <folding />
             </state>
           </provider>
@@ -166,12 +129,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>setIsCa</find>
-      <find>setIsCalled</find>
-      <find>Variable</find>
-      <find>astfunction</find>
-      <find>a</find>
-      <find>astas</find>
       <find>has no value in currentScope</find>
       <find>AST</find>
       <find>astcons</find>
@@ -192,15 +149,24 @@
       <find>ASTF</find>
       <find>astnot</find>
       <find>asti</find>
-      <find>func</find>
       <find>astfun</find>
       <find>funcCall</find>
       <find>System.out.println</find>
+      <find>func</find>
+      <find>Program</find>
+      <find>TILDA</find>
+      <find>Invalid type assigned to constant</find>
+      <find>&quot;Programme&quot;</find>
+      <find>&quot;Main&quot;</find>
+      <find>MINUS</find>
     </findStrings>
     <replaceStrings>
       <replace>node2</replace>
       <replace>child2</replace>
       <replace>ThreeAddressCode</replace>
+      <replace>PROGRAMME</replace>
+      <replace>MAIN</replace>
+      <replace>Programme</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -220,13 +186,13 @@
         <option value="$PROJECT_DIR$/src/FunctionSymbol.java" />
         <option value="$PROJECT_DIR$/src/Variable.java" />
         <option value="$PROJECT_DIR$/src/Symbol.java" />
-        <option value="$PROJECT_DIR$/src/ccal_parser.jjt" />
-        <option value="$PROJECT_DIR$/test3.ccal" />
         <option value="$PROJECT_DIR$/test4.ccal" />
         <option value="$PROJECT_DIR$/src/Representor.java" />
-        <option value="$PROJECT_DIR$/src/ThreeAddressCode.java" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/src/ccal_parser.jjt" />
+        <option value="$PROJECT_DIR$/src/ThreeAddressCode.java" />
         <option value="$PROJECT_DIR$/src/Representer.java" />
+        <option value="$PROJECT_DIR$/test3.ccal" />
         <option value="$PROJECT_DIR$/src/Visitor.java" />
       </list>
     </option>
@@ -258,7 +224,9 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -280,9 +248,7 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
-      <pane id="AndroidView" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -418,7 +384,8 @@
       <workItem from="1510594892909" duration="90000" />
       <workItem from="1512408034901" duration="5506000" />
       <workItem from="1512415201887" duration="8772000" />
-      <workItem from="1512575709349" duration="13519000" />
+      <workItem from="1512575709349" duration="16258000" />
+      <workItem from="1512592247075" duration="6095000" />
     </task>
     <task id="LOCAL-00001" summary="Bracket Fix">
       <created>1509988611472</created>
@@ -462,11 +429,18 @@
       <option name="project" value="LOCAL" />
       <updated>1512585552854</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Removing error prints and adding threeaddresscode implementation">
+      <created>1512589443942</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1512589443942</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31306000" />
+    <option name="totallyTimeSpent" value="40140000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -485,7 +459,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32934782" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25746268" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26012793" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -543,7 +517,8 @@
     <MESSAGE value="TODO: Multiple comparisons in one if statement" />
     <MESSAGE value="Updates And Variable Tracking" />
     <MESSAGE value="Adding Variable &amp; Representer class" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding Variable &amp; Representer class" />
+    <MESSAGE value="Removing error prints and adding threeaddresscode implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Removing error prints and adding threeaddresscode implementation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -556,28 +531,139 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Visitor.java</url>
-          <line>795</line>
+          <line>625</line>
           <properties />
           <option name="timeStamp" value="32" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Representer.java</url>
-          <line>205</line>
-          <properties />
-          <option name="timeStamp" value="60" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Representer.java</url>
-          <line>225</line>
-          <properties />
-          <option name="timeStamp" value="61" />
-        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="62" />
+      <option name="time" value="76" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/ccal_parser.jjt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3043">
+          <caret line="179" column="33" lean-forward="false" selection-start-line="179" selection-start-column="33" selection-end-line="179" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ThreeAddressCode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="18" lean-forward="false" selection-start-line="0" selection-start-column="18" selection-end-line="0" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Representer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6494">
+          <caret line="459" column="0" lean-forward="false" selection-start-line="459" selection-start-column="0" selection-end-line="459" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#visit#1;class#Representer#0" expanded="false" />
+            <element signature="method#visit#2;class#Representer#0" expanded="false" />
+            <element signature="method#visit#3;class#Representer#0" expanded="false" />
+            <element signature="method#visit#4;class#Representer#0" expanded="false" />
+            <element signature="method#visit#10;class#Representer#0" expanded="false" />
+            <element signature="method#visit#18;class#Representer#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ASTFunctionCall.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="12" lean-forward="false" selection-start-line="0" selection-start-column="12" selection-end-line="0" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test4.ccal">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="27" column="9" lean-forward="false" selection-start-line="27" selection-start-column="9" selection-end-line="27" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="22" lean-forward="false" selection-start-line="11" selection-start-column="22" selection-end-line="11" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test3.ccal">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="16" column="7" lean-forward="false" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Visitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="850">
+          <caret line="168" column="130" lean-forward="false" selection-start-line="168" selection-start-column="130" selection-end-line="168" selection-end-column="130" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#visit#1;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#2;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#3;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#4;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#5;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#6;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#7;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#8;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#9;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#10;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#11;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#12;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#14;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#15;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#16;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#17;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#18;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#19;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#20;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#21;class#Visitor#0" expanded="false" />
+            <element signature="e#21825#21826#0" expanded="true" />
+            <element signature="e#21866#21867#0" expanded="true" />
+            <element signature="e#21935#21936#0" expanded="true" />
+            <element signature="e#21976#21977#0" expanded="true" />
+            <element signature="e#22049#22050#0" expanded="true" />
+            <element signature="e#22090#22091#0" expanded="true" />
+            <element signature="e#23318#23319#0" expanded="true" />
+            <element signature="e#23359#23360#0" expanded="true" />
+            <element signature="method#setAsReadAndCalled#0;class#Visitor#0" expanded="false" />
+            <element signature="method#updateSymbol#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isSematicError#0;class#Visitor#0" expanded="false" />
+            <element signature="method#printErrorList#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isInt#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isValidBooleanComparison#0;class#Visitor#0" expanded="false" />
+            <element signature="method#checkBooleanComparison#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isValidBooleanOperation#0;class#Visitor#0" expanded="false" />
+            <element signature="method#evaluateChildCondition#0;class#Visitor#0" expanded="false" />
+            <element signature="method#performArithmatic#0;class#Visitor#0" expanded="false" />
+            <element signature="method#evaluateArithmaticChildren#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isValidArithmetic#0;class#Visitor#0" expanded="false" />
+            <marker date="1512598294258" expanded="false" signature="42731:43206" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/ccal_parser.jjt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -592,18 +678,47 @@
           <caret line="458" column="5" lean-forward="false" selection-start-line="458" selection-start-column="5" selection-end-line="458" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#visit#1;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#2;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#3;class#Visitor#0" expanded="false" />
             <element signature="method#visit#4;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#5;class#Visitor#0" expanded="false" />
             <element signature="method#visit#6;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#7;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#8;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#9;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#10;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#11;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#12;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#14;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#15;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#16;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#17;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#18;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#19;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#20;class#Visitor#0" expanded="false" />
             <element signature="method#visit#21;class#Visitor#0" expanded="false" />
-            <element signature="method#isValidArithmetic#0;class#Visitor#0" expanded="false" />
-            <element signature="method#visit#35;class#Visitor#0" expanded="false" />
+            <element signature="e#21825#21826#0" expanded="true" />
+            <element signature="e#21866#21867#0" expanded="true" />
+            <element signature="e#21935#21936#0" expanded="true" />
+            <element signature="e#21976#21977#0" expanded="true" />
+            <element signature="e#22049#22050#0" expanded="true" />
+            <element signature="e#22090#22091#0" expanded="true" />
+            <element signature="e#23318#23319#0" expanded="true" />
+            <element signature="e#23359#23360#0" expanded="true" />
+            <element signature="method#setAsReadAndCalled#0;class#Visitor#0" expanded="false" />
+            <element signature="method#updateSymbol#0;class#Visitor#0" expanded="false" />
             <element signature="method#isSematicError#0;class#Visitor#0" expanded="false" />
+            <element signature="method#printErrorList#0;class#Visitor#0" expanded="false" />
             <element signature="method#isInt#0;class#Visitor#0" expanded="false" />
             <element signature="method#isValidBooleanComparison#0;class#Visitor#0" expanded="false" />
             <element signature="method#checkBooleanComparison#0;class#Visitor#0" expanded="false" />
             <element signature="method#isValidBooleanOperation#0;class#Visitor#0" expanded="false" />
             <element signature="method#evaluateChildCondition#0;class#Visitor#0" expanded="false" />
-            <element signature="class#ErrorMessage#0;class#Visitor#0" expanded="false" />
+            <element signature="method#performArithmatic#0;class#Visitor#0" expanded="false" />
+            <element signature="method#evaluateArithmaticChildren#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isValidArithmetic#0;class#Visitor#0" expanded="false" />
+            <marker date="1512598294258" expanded="false" signature="42731:43206" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -613,8 +728,21 @@
         <state relative-caret-position="357">
           <caret line="29" column="10" lean-forward="false" selection-start-line="29" selection-start-column="10" selection-end-line="29" selection-end-column="10" />
           <folding>
-            <element signature="e#669#670#0" expanded="true" />
-            <element signature="e#696#697#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+            <element signature="e#414#415#0" expanded="false" />
+            <element signature="e#460#461#0" expanded="false" />
+            <element signature="e#1004#1005#0" expanded="false" />
+            <element signature="e#1031#1032#0" expanded="false" />
+            <element signature="e#1094#1095#0" expanded="false" />
+            <element signature="e#1123#1124#0" expanded="false" />
+            <element signature="e#1155#1156#0" expanded="false" />
+            <element signature="e#1184#1185#0" expanded="false" />
+            <element signature="e#1208#1209#0" expanded="false" />
+            <element signature="e#1238#1239#0" expanded="false" />
+            <element signature="e#1576#1577#0" expanded="false" />
+            <element signature="e#1615#1616#0" expanded="false" />
+            <element signature="e#1965#1966#0" expanded="false" />
+            <element signature="e#2026#2027#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -649,18 +777,47 @@
           <caret line="380" column="0" lean-forward="false" selection-start-line="380" selection-start-column="0" selection-end-line="380" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#visit#1;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#2;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#3;class#Visitor#0" expanded="false" />
             <element signature="method#visit#4;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#5;class#Visitor#0" expanded="false" />
             <element signature="method#visit#6;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#7;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#8;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#9;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#10;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#11;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#12;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#14;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#15;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#16;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#17;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#18;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#19;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#20;class#Visitor#0" expanded="false" />
             <element signature="method#visit#21;class#Visitor#0" expanded="false" />
-            <element signature="method#isValidArithmetic#0;class#Visitor#0" expanded="false" />
-            <element signature="method#visit#35;class#Visitor#0" expanded="false" />
+            <element signature="e#21825#21826#0" expanded="true" />
+            <element signature="e#21866#21867#0" expanded="true" />
+            <element signature="e#21935#21936#0" expanded="true" />
+            <element signature="e#21976#21977#0" expanded="true" />
+            <element signature="e#22049#22050#0" expanded="true" />
+            <element signature="e#22090#22091#0" expanded="true" />
+            <element signature="e#23318#23319#0" expanded="true" />
+            <element signature="e#23359#23360#0" expanded="true" />
+            <element signature="method#setAsReadAndCalled#0;class#Visitor#0" expanded="false" />
+            <element signature="method#updateSymbol#0;class#Visitor#0" expanded="false" />
             <element signature="method#isSematicError#0;class#Visitor#0" expanded="false" />
+            <element signature="method#printErrorList#0;class#Visitor#0" expanded="false" />
             <element signature="method#isInt#0;class#Visitor#0" expanded="false" />
             <element signature="method#isValidBooleanComparison#0;class#Visitor#0" expanded="false" />
             <element signature="method#checkBooleanComparison#0;class#Visitor#0" expanded="false" />
             <element signature="method#isValidBooleanOperation#0;class#Visitor#0" expanded="false" />
             <element signature="method#evaluateChildCondition#0;class#Visitor#0" expanded="false" />
-            <element signature="class#ErrorMessage#0;class#Visitor#0" expanded="false" />
+            <element signature="method#performArithmatic#0;class#Visitor#0" expanded="false" />
+            <element signature="method#evaluateArithmaticChildren#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isValidArithmetic#0;class#Visitor#0" expanded="false" />
+            <marker date="1512598294258" expanded="false" signature="42731:43206" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -670,8 +827,21 @@
         <state relative-caret-position="0">
           <caret line="0" column="31" lean-forward="true" selection-start-line="0" selection-start-column="31" selection-end-line="0" selection-end-column="31" />
           <folding>
-            <element signature="e#669#670#0" expanded="true" />
-            <element signature="e#696#697#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+            <element signature="e#414#415#0" expanded="false" />
+            <element signature="e#460#461#0" expanded="false" />
+            <element signature="e#1004#1005#0" expanded="false" />
+            <element signature="e#1031#1032#0" expanded="false" />
+            <element signature="e#1094#1095#0" expanded="false" />
+            <element signature="e#1123#1124#0" expanded="false" />
+            <element signature="e#1155#1156#0" expanded="false" />
+            <element signature="e#1184#1185#0" expanded="false" />
+            <element signature="e#1208#1209#0" expanded="false" />
+            <element signature="e#1238#1239#0" expanded="false" />
+            <element signature="e#1576#1577#0" expanded="false" />
+            <element signature="e#1615#1616#0" expanded="false" />
+            <element signature="e#1965#1966#0" expanded="false" />
+            <element signature="e#2026#2027#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -745,11 +915,11 @@
         <state relative-caret-position="185">
           <caret line="103" column="0" lean-forward="false" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
           <folding>
-            <marker date="1512584311702" expanded="false" signature="45396:45404" ph=" { " />
-            <marker date="1512584311702" expanded="false" signature="45423:45427" ph=" }" />
-            <marker date="1512584311702" expanded="false" signature="46388:46396" ph=" { " />
-            <marker date="1512584311702" expanded="false" signature="46417:46421" ph=" }" />
-            <marker date="1512584311702" expanded="false" signature="49619:49646" ph="/serial/" />
+            <marker date="1512592264556" expanded="false" signature="45396:45404" ph=" { " />
+            <marker date="1512592264556" expanded="false" signature="45423:45427" ph=" }" />
+            <marker date="1512592264556" expanded="false" signature="46388:46396" ph=" { " />
+            <marker date="1512592264556" expanded="false" signature="46417:46421" ph=" }" />
+            <marker date="1512592264556" expanded="false" signature="49619:49646" ph="/serial/" />
           </folding>
         </state>
       </provider>
@@ -788,43 +958,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/FunctionSymbol.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="22" column="27" lean-forward="false" selection-start-line="22" selection-start-column="27" selection-end-line="22" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/VariableSymbol.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="65" column="23" lean-forward="false" selection-start-line="65" selection-start-column="23" selection-end-line="65" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/FunctionSymbol.java" />
+    <entry file="file://$PROJECT_DIR$/src/VariableSymbol.java" />
     <entry file="file://$PROJECT_DIR$/src/Variable.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
           <caret line="18" column="0" lean-forward="false" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
           <folding>
-            <element signature="e#214#215#0" expanded="true" />
-            <element signature="e#241#242#0" expanded="true" />
-            <element signature="e#281#282#0" expanded="true" />
-            <element signature="e#313#314#0" expanded="true" />
-            <element signature="e#373#374#0" expanded="true" />
-            <element signature="e#415#416#0" expanded="true" />
-            <element signature="e#449#450#0" expanded="true" />
+            <element signature="e#214#215#0" expanded="false" />
+            <element signature="e#241#242#0" expanded="false" />
+            <element signature="e#281#282#0" expanded="false" />
+            <element signature="e#313#314#0" expanded="false" />
+            <element signature="e#373#374#0" expanded="false" />
+            <element signature="e#415#416#0" expanded="false" />
+            <element signature="e#449#450#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test4.ccal">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="427">
-          <caret line="27" column="9" lean-forward="false" selection-start-line="27" selection-start-column="9" selection-end-line="27" selection-end-column="9" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -840,7 +988,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -848,7 +995,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -858,49 +1004,20 @@
           <caret line="109" column="67" lean-forward="false" selection-start-line="109" selection-start-column="67" selection-end-line="109" selection-end-column="67" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#414#415#0" expanded="true" />
-            <element signature="e#460#461#0" expanded="true" />
-            <element signature="e#1004#1005#0" expanded="true" />
-            <element signature="e#1031#1032#0" expanded="true" />
-            <element signature="e#1094#1095#0" expanded="true" />
-            <element signature="e#1123#1124#0" expanded="true" />
-            <element signature="e#1155#1156#0" expanded="true" />
-            <element signature="e#1184#1185#0" expanded="true" />
-            <element signature="e#1208#1209#0" expanded="true" />
-            <element signature="e#1238#1239#0" expanded="true" />
-            <element signature="e#1576#1577#0" expanded="true" />
-            <element signature="e#1615#1616#0" expanded="true" />
-            <element signature="e#1965#1966#0" expanded="true" />
-            <element signature="e#2026#2027#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ccal_parser.jjt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2567">
-          <caret line="151" column="59" lean-forward="false" selection-start-line="151" selection-start-column="55" selection-end-line="151" selection-end-column="59" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/SimpleNode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="952">
-          <caret line="65" column="0" lean-forward="false" selection-start-line="65" selection-start-column="0" selection-end-line="65" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ThreeAddressCode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="18" lean-forward="true" selection-start-line="0" selection-start-column="18" selection-end-line="0" selection-end-column="18" />
-          <folding>
-            <element signature="e#241#242#0" expanded="true" />
-            <element signature="e#267#268#0" expanded="true" />
-            <element signature="e#689#690#0" expanded="true" />
-            <element signature="e#759#760#0" expanded="true" />
+            <element signature="e#414#415#0" expanded="false" />
+            <element signature="e#460#461#0" expanded="false" />
+            <element signature="e#1004#1005#0" expanded="false" />
+            <element signature="e#1031#1032#0" expanded="false" />
+            <element signature="e#1094#1095#0" expanded="false" />
+            <element signature="e#1123#1124#0" expanded="false" />
+            <element signature="e#1155#1156#0" expanded="false" />
+            <element signature="e#1184#1185#0" expanded="false" />
+            <element signature="e#1208#1209#0" expanded="false" />
+            <element signature="e#1238#1239#0" expanded="false" />
+            <element signature="e#1576#1577#0" expanded="false" />
+            <element signature="e#1615#1616#0" expanded="false" />
+            <element signature="e#1965#1966#0" expanded="false" />
+            <element signature="e#2026#2027#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -913,14 +1030,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test3.ccal">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" column="7" lean-forward="false" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="7" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/ASTFunctionCall.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="221">
@@ -929,61 +1038,111 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/ThreeAddressCode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="10" lean-forward="false" selection-start-line="1" selection-start-column="4" selection-end-line="1" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Representer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="368">
-          <caret line="459" column="0" lean-forward="false" selection-start-line="459" selection-start-column="0" selection-end-line="459" selection-end-column="0" />
+        <state relative-caret-position="262">
+          <caret line="197" column="0" lean-forward="false" selection-start-line="197" selection-start-column="0" selection-end-line="197" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#visit#1;class#Representer#0" expanded="false" />
             <element signature="method#visit#2;class#Representer#0" expanded="false" />
             <element signature="method#visit#3;class#Representer#0" expanded="false" />
             <element signature="method#visit#4;class#Representer#0" expanded="false" />
-            <element signature="e#2705#2706#0" expanded="true" />
-            <element signature="e#2732#2733#0" expanded="true" />
-            <element signature="e#2805#2806#0" expanded="true" />
-            <element signature="e#2832#2833#0" expanded="true" />
-            <element signature="e#2901#2902#0" expanded="true" />
-            <element signature="e#2928#2929#0" expanded="true" />
             <element signature="method#visit#10;class#Representer#0" expanded="false" />
-            <element signature="e#3756#3757#0" expanded="true" />
-            <element signature="e#3783#3784#0" expanded="true" />
-            <element signature="e#6131#6132#0" expanded="true" />
-            <element signature="e#6158#6159#0" expanded="true" />
-            <element signature="e#6234#6235#0" expanded="true" />
-            <element signature="e#6261#6262#0" expanded="true" />
-            <element signature="e#6328#6329#0" expanded="true" />
-            <element signature="e#6355#6356#0" expanded="true" />
-            <element signature="e#6427#6428#0" expanded="true" />
-            <element signature="e#6484#6485#0" expanded="true" />
-            <element signature="e#6553#6554#0" expanded="true" />
-            <element signature="e#6610#6611#0" expanded="true" />
-            <element signature="e#6683#6684#0" expanded="true" />
-            <element signature="e#6740#6741#0" expanded="true" />
-            <element signature="e#11003#11004#0" expanded="true" />
-            <element signature="e#11060#11061#0" expanded="true" />
+            <element signature="method#visit#18;class#Representer#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test4.ccal">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="427">
+          <caret line="27" column="9" lean-forward="false" selection-start-line="27" selection-start-column="9" selection-end-line="27" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/SimpleNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="197">
+          <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+          <folding>
+            <element signature="e#1057#1058#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test3.ccal">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" column="7" lean-forward="false" selection-start-line="14" selection-start-column="7" selection-end-line="14" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ccal_parser.jjt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="233">
+          <caret line="312" column="0" lean-forward="false" selection-start-line="312" selection-start-column="0" selection-end-line="316" selection-end-column="1" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Visitor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="214">
-          <caret line="822" column="30" lean-forward="false" selection-start-line="822" selection-start-column="12" selection-end-line="822" selection-end-column="30" />
+        <state relative-caret-position="-1504">
+          <caret line="529" column="99" lean-forward="false" selection-start-line="529" selection-start-column="99" selection-end-line="529" selection-end-column="99" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#visit#1;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#2;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#3;class#Visitor#0" expanded="false" />
             <element signature="method#visit#4;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#5;class#Visitor#0" expanded="false" />
             <element signature="method#visit#6;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#7;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#8;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#9;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#10;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#11;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#12;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#14;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#15;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#16;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#17;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#18;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#19;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#20;class#Visitor#0" expanded="false" />
             <element signature="method#visit#21;class#Visitor#0" expanded="false" />
-            <element signature="method#isValidArithmetic#0;class#Visitor#0" expanded="false" />
-            <element signature="method#visit#35;class#Visitor#0" expanded="false" />
+            <element signature="e#21825#21826#0" expanded="true" />
+            <element signature="e#21866#21867#0" expanded="true" />
+            <element signature="e#21935#21936#0" expanded="true" />
+            <element signature="e#21976#21977#0" expanded="true" />
+            <element signature="e#22049#22050#0" expanded="true" />
+            <element signature="e#22090#22091#0" expanded="true" />
+            <element signature="e#23318#23319#0" expanded="true" />
+            <element signature="e#23359#23360#0" expanded="true" />
+            <element signature="method#setAsReadAndCalled#0;class#Visitor#0" expanded="false" />
+            <element signature="method#updateSymbol#0;class#Visitor#0" expanded="false" />
             <element signature="method#isSematicError#0;class#Visitor#0" expanded="false" />
+            <element signature="method#printErrorList#0;class#Visitor#0" expanded="false" />
             <element signature="method#isInt#0;class#Visitor#0" expanded="false" />
             <element signature="method#isValidBooleanComparison#0;class#Visitor#0" expanded="false" />
             <element signature="method#checkBooleanComparison#0;class#Visitor#0" expanded="false" />
             <element signature="method#isValidBooleanOperation#0;class#Visitor#0" expanded="false" />
             <element signature="method#evaluateChildCondition#0;class#Visitor#0" expanded="false" />
-            <element signature="class#ErrorMessage#0;class#Visitor#0" expanded="false" />
+            <element signature="method#performArithmatic#0;class#Visitor#0" expanded="false" />
+            <element signature="method#evaluateArithmaticChildren#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isValidArithmetic#0;class#Visitor#0" expanded="false" />
+            <marker date="1512598294258" expanded="false" signature="42731:43206" ph="{...}" />
           </folding>
         </state>
       </provider>
