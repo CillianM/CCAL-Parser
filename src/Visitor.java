@@ -70,6 +70,8 @@ public class Visitor implements CCALParserVisitor {
         if (errorList.size() == 0) {
             isSematicError();
             System.out.println("No errors found");
+            Representer representer = new Representer();
+            node.jjtAccept(representer, symbolTable);
         } else {
             System.out.println(errorList.size() + " error(s).");
             printErrorList();
@@ -339,9 +341,7 @@ public class Visitor implements CCALParserVisitor {
             if (mapTemp1.get(id.image) != null && currentScope.equals("Main")) {
                 // error
                 // id already declared in currentScope Program, if currentScope is Main
-                System.out.println("Variable \"" + id.image + "\" already declared in currentScope \"" + currentScope + "\"");
-                System.out.println("Error at line " + id.beginLine + ", column " + id.beginColumn);
-                System.out.println();
+                errorList.add(new ErrorMessage(id.beginLine, id.beginColumn,"Variable \"" + id.image + "\" already declared in currentScope \"" + currentScope + "\""));
             }
         }
 
@@ -363,9 +363,7 @@ public class Visitor implements CCALParserVisitor {
             symbol.setDataType(DataType.Variable);
             mapTemp2.put(id.image, symbol);
         } else {
-            System.out.println("Variable \"" + id.image + "\" already declared in currentScope \"" + currentScope + "\"");
-            System.out.println("Error at line " + id.beginLine + ", column " + id.beginColumn);
-            System.out.println();
+            errorList.add(new ErrorMessage(id.beginLine,id.beginColumn,"Variable \"" + id.image + "\" already declared in currentScope \"" + currentScope + "\""));
         }
         symbolTable.put(currentScope, mapTemp2);
 
@@ -505,20 +503,10 @@ public class Visitor implements CCALParserVisitor {
         }
 
         if (argStc == null) {
-            // error
-            // no such var or const in this currentScope with that name
-            System.out.println("Variable or Const \"" + arg.image + "\" has not been declared in currentScope \"" + currentScope + "\"");
-            System.out.println("Error at line " + arg.beginLine + ", column " + arg.beginColumn);
-            System.out.println();
-            //numberOfErrors++;
+            errorList.add(new ErrorMessage(arg.beginLine,arg.beginColumn,"Variable or Const \"" + arg.image + "\" has not been declared in currentScope \"" + currentScope + "\""));
         } else if (argStc.getValues().size() == 0) {
             if (currentScope.equals("Program") || currentScope.equals("Main")) {
-                // error
-                // there is a var in this currentScope with that name, but it has no value
-                System.out.println("Variable \"" + arg.image + "\" has been declared in currentScope \"" + currentScope + "\", but has no value");
-                System.out.println("Error at line " + arg.beginLine + ", column " + arg.beginColumn);
-                System.out.println();
-                //numberOfErrors++;
+                errorList.add(new ErrorMessage(arg.beginLine,arg.beginColumn,"Variable \"" + arg.image + "\" has been declared in currentScope \"" + currentScope + "\", but has no value"));
             }
         } else {
             argStc.setIsRead(true);
@@ -882,8 +870,6 @@ public class Visitor implements CCALParserVisitor {
                     return false;
                 }
             } else if (!symbol.getType().image.equals("boolean")) {
-                // error if is not a boolean
-                System.out.println();
                 errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, symbol.getDataType() + " \"" + token.image + "\" is not of type boolean"));
                 return false;
             }

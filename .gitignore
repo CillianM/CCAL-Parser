@@ -9,6 +9,7 @@
 !DataType.java
 !Representer.java
 !Variable.java
+!ThreeAddressCode.java
 
 # JJ Files
 *.jj
