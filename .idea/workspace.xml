@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="226487bd-0f83-4444-80f8-483f5308fba1" name="Default" comment="Comparison Updates">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Symbol.java" afterPath="$PROJECT_DIR$/src/Symbol.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Visitor.java" afterPath="$PROJECT_DIR$/src/Visitor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ccal_parser.jjt" afterPath="$PROJECT_DIR$/src/ccal_parser.jjt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test3.ccal" afterPath="$PROJECT_DIR$/test3.ccal" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test4.ccal" afterPath="$PROJECT_DIR$/test4.ccal" />
+    <list default="true" id="226487bd-0f83-4444-80f8-483f5308fba1" name="Default" comment="Adding Variable &amp; Representor class">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/Representer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -83,18 +80,123 @@
         <entry file="file://$PROJECT_DIR$/test3.ccal">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="272">
-              <caret line="16" column="7" lean-forward="true" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="7" />
+              <caret line="16" column="7" lean-forward="false" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="7" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test4.ccal" pinned="false" current-in-tab="true">
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="150">
+              <caret line="9" column="11" lean-forward="false" selection-start-line="9" selection-start-column="11" selection-end-line="9" selection-end-column="11" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test4.ccal" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test4.ccal">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-522">
-              <caret line="1" column="10" lean-forward="false" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="10" />
+            <state relative-caret-position="427">
+              <caret line="27" column="9" lean-forward="false" selection-start-line="27" selection-start-column="9" selection-end-line="27" selection-end-column="9" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test1.ccal" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test1.ccal">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Representer.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Representer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="22" lean-forward="false" selection-start-line="0" selection-start-column="22" selection-end-line="0" selection-end-column="22" />
+              <folding>
+                <element signature="e#124#125#0" expanded="true" />
+                <element signature="e#151#152#0" expanded="true" />
+                <element signature="e#224#225#0" expanded="true" />
+                <element signature="e#251#252#0" expanded="true" />
+                <element signature="e#319#320#0" expanded="true" />
+                <element signature="e#346#347#0" expanded="true" />
+                <element signature="e#422#423#0" expanded="true" />
+                <element signature="e#449#450#0" expanded="true" />
+                <element signature="e#521#522#0" expanded="true" />
+                <element signature="e#548#549#0" expanded="true" />
+                <element signature="e#624#625#0" expanded="true" />
+                <element signature="e#651#652#0" expanded="true" />
+                <element signature="e#730#731#0" expanded="true" />
+                <element signature="e#757#758#0" expanded="true" />
+                <element signature="e#830#831#0" expanded="true" />
+                <element signature="e#857#858#0" expanded="true" />
+                <element signature="e#926#927#0" expanded="true" />
+                <element signature="e#953#954#0" expanded="true" />
+                <element signature="e#1032#1033#0" expanded="true" />
+                <element signature="e#1059#1060#0" expanded="true" />
+                <element signature="e#1139#1140#0" expanded="true" />
+                <element signature="e#1166#1167#0" expanded="true" />
+                <element signature="e#1244#1245#0" expanded="true" />
+                <element signature="e#1271#1272#0" expanded="true" />
+                <element signature="e#1349#1350#0" expanded="true" />
+                <element signature="e#1376#1377#0" expanded="true" />
+                <element signature="e#1449#1450#0" expanded="true" />
+                <element signature="e#1476#1477#0" expanded="true" />
+                <element signature="e#1542#1543#0" expanded="true" />
+                <element signature="e#1569#1570#0" expanded="true" />
+                <element signature="e#1638#1639#0" expanded="true" />
+                <element signature="e#1665#1666#0" expanded="true" />
+                <element signature="e#1733#1734#0" expanded="true" />
+                <element signature="e#1760#1761#0" expanded="true" />
+                <element signature="e#1827#1828#0" expanded="true" />
+                <element signature="e#1854#1855#0" expanded="true" />
+                <element signature="e#1930#1931#0" expanded="true" />
+                <element signature="e#1957#1958#0" expanded="true" />
+                <element signature="e#2026#2027#0" expanded="true" />
+                <element signature="e#2053#2054#0" expanded="true" />
+                <element signature="e#2129#2130#0" expanded="true" />
+                <element signature="e#2156#2157#0" expanded="true" />
+                <element signature="e#2223#2224#0" expanded="true" />
+                <element signature="e#2250#2251#0" expanded="true" />
+                <element signature="e#2322#2323#0" expanded="true" />
+                <element signature="e#2349#2350#0" expanded="true" />
+                <element signature="e#2418#2419#0" expanded="true" />
+                <element signature="e#2445#2446#0" expanded="true" />
+                <element signature="e#2518#2519#0" expanded="true" />
+                <element signature="e#2545#2546#0" expanded="true" />
+                <element signature="e#2614#2615#0" expanded="true" />
+                <element signature="e#2641#2642#0" expanded="true" />
+                <element signature="e#2713#2714#0" expanded="true" />
+                <element signature="e#2740#2741#0" expanded="true" />
+                <element signature="e#2812#2813#0" expanded="true" />
+                <element signature="e#2839#2840#0" expanded="true" />
+                <element signature="e#2916#2917#0" expanded="true" />
+                <element signature="e#2943#2944#0" expanded="true" />
+                <element signature="e#3018#3019#0" expanded="true" />
+                <element signature="e#3045#3046#0" expanded="true" />
+                <element signature="e#3125#3126#0" expanded="true" />
+                <element signature="e#3152#3153#0" expanded="true" />
+                <element signature="e#3218#3219#0" expanded="true" />
+                <element signature="e#3245#3246#0" expanded="true" />
+                <element signature="e#3312#3313#0" expanded="true" />
+                <element signature="e#3339#3340#0" expanded="true" />
+                <element signature="e#3410#3411#0" expanded="true" />
+                <element signature="e#3437#3438#0" expanded="true" />
+                <element signature="e#3504#3505#0" expanded="true" />
+                <element signature="e#3531#3532#0" expanded="true" />
+                <element signature="e#3603#3604#0" expanded="true" />
+                <element signature="e#3630#3631#0" expanded="true" />
+                <element signature="e#3704#3705#0" expanded="true" />
+                <element signature="e#3731#3732#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -110,7 +212,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>astreturn</find>
       <find>AstA</find>
       <find>FunctionCall</find>
       <find>ASTFunctionCall</find>
@@ -140,6 +241,7 @@
       <find>result</find>
       <find>Symbol</find>
       <find>Assignmen</find>
+      <find>five</find>
     </findStrings>
     <replaceStrings>
       <replace>node2</replace>
@@ -159,8 +261,6 @@
       <list>
         <option value="$PROJECT_DIR$/src/grammar.jj" />
         <option value="$PROJECT_DIR$/src/CCALParser.java" />
-        <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/test4.ccal" />
         <option value="$PROJECT_DIR$/src/VariableSymbol.java" />
         <option value="$PROJECT_DIR$/src/FunctionSymbol.java" />
         <option value="$PROJECT_DIR$/src/Variable.java" />
@@ -168,6 +268,9 @@
         <option value="$PROJECT_DIR$/src/ccal_parser.jjt" />
         <option value="$PROJECT_DIR$/test3.ccal" />
         <option value="$PROJECT_DIR$/src/Visitor.java" />
+        <option value="$PROJECT_DIR$/test4.ccal" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/src/Representor.java" />
       </list>
     </option>
   </component>
@@ -251,7 +354,7 @@
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="MAIN_CLASS_NAME" value="CCALParser" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="test4.ccal" />
+      <option name="PROGRAM_PARAMETERS" value="test1.ccal" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
@@ -357,7 +460,7 @@
       <workItem from="1510594892909" duration="90000" />
       <workItem from="1512408034901" duration="5506000" />
       <workItem from="1512415201887" duration="8772000" />
-      <workItem from="1512575709349" duration="8370000" />
+      <workItem from="1512575709349" duration="9636000" />
     </task>
     <task id="LOCAL-00001" summary="Bracket Fix">
       <created>1509988611472</created>
@@ -387,11 +490,18 @@
       <option name="project" value="LOCAL" />
       <updated>1512423907492</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Updates And Variable Tracking">
+      <created>1512584292055</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1512584292055</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="26157000" />
+    <option name="totallyTimeSpent" value="27423000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -466,7 +576,8 @@
     <MESSAGE value="Updated Semantic Checks" />
     <MESSAGE value="Comparison Updates" />
     <MESSAGE value="TODO: Multiple comparisons in one if statement" />
-    <option name="LAST_COMMIT_MESSAGE" value="TODO: Multiple comparisons in one if statement" />
+    <MESSAGE value="Updates And Variable Tracking" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updates And Variable Tracking" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -678,11 +789,11 @@
         <state relative-caret-position="185">
           <caret line="103" column="0" lean-forward="false" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
           <folding>
-            <marker date="1512423638397" expanded="false" signature="45401:45409" ph=" { " />
-            <marker date="1512423638397" expanded="false" signature="45428:45432" ph=" }" />
-            <marker date="1512423638397" expanded="false" signature="46393:46401" ph=" { " />
-            <marker date="1512423638397" expanded="false" signature="46422:46426" ph=" }" />
-            <marker date="1512423638397" expanded="false" signature="49624:49651" ph="/serial/" />
+            <marker date="1512584311702" expanded="false" signature="45396:45404" ph=" { " />
+            <marker date="1512584311702" expanded="false" signature="45423:45427" ph=" }" />
+            <marker date="1512584311702" expanded="false" signature="46388:46396" ph=" { " />
+            <marker date="1512584311702" expanded="false" signature="46417:46421" ph=" }" />
+            <marker date="1512584311702" expanded="false" signature="49619:49646" ph="/serial/" />
           </folding>
         </state>
       </provider>
@@ -716,16 +827,8 @@
         <state relative-caret-position="202">
           <caret line="99" column="0" lean-forward="false" selection-start-line="99" selection-start-column="0" selection-end-line="99" selection-end-column="0" />
           <folding>
-            <element signature="e#3136#3137#0" expanded="true" />
+            <element signature="e#3136#3137#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="561">
-          <caret line="33" column="14" lean-forward="false" selection-start-line="33" selection-start-column="14" selection-end-line="33" selection-end-column="14" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -796,7 +899,7 @@
     <entry file="file://$PROJECT_DIR$/test3.ccal">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
-          <caret line="16" column="7" lean-forward="true" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="7" />
+          <caret line="16" column="7" lean-forward="false" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="7" />
           <folding />
         </state>
       </provider>
@@ -834,8 +937,107 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test4.ccal">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-522">
-          <caret line="1" column="10" lean-forward="false" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="10" />
+        <state relative-caret-position="427">
+          <caret line="27" column="9" lean-forward="false" selection-start-line="27" selection-start-column="9" selection-end-line="27" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test1.ccal">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Representer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="22" lean-forward="false" selection-start-line="0" selection-start-column="22" selection-end-line="0" selection-end-column="22" />
+          <folding>
+            <element signature="e#124#125#0" expanded="true" />
+            <element signature="e#151#152#0" expanded="true" />
+            <element signature="e#224#225#0" expanded="true" />
+            <element signature="e#251#252#0" expanded="true" />
+            <element signature="e#319#320#0" expanded="true" />
+            <element signature="e#346#347#0" expanded="true" />
+            <element signature="e#422#423#0" expanded="true" />
+            <element signature="e#449#450#0" expanded="true" />
+            <element signature="e#521#522#0" expanded="true" />
+            <element signature="e#548#549#0" expanded="true" />
+            <element signature="e#624#625#0" expanded="true" />
+            <element signature="e#651#652#0" expanded="true" />
+            <element signature="e#730#731#0" expanded="true" />
+            <element signature="e#757#758#0" expanded="true" />
+            <element signature="e#830#831#0" expanded="true" />
+            <element signature="e#857#858#0" expanded="true" />
+            <element signature="e#926#927#0" expanded="true" />
+            <element signature="e#953#954#0" expanded="true" />
+            <element signature="e#1032#1033#0" expanded="true" />
+            <element signature="e#1059#1060#0" expanded="true" />
+            <element signature="e#1139#1140#0" expanded="true" />
+            <element signature="e#1166#1167#0" expanded="true" />
+            <element signature="e#1244#1245#0" expanded="true" />
+            <element signature="e#1271#1272#0" expanded="true" />
+            <element signature="e#1349#1350#0" expanded="true" />
+            <element signature="e#1376#1377#0" expanded="true" />
+            <element signature="e#1449#1450#0" expanded="true" />
+            <element signature="e#1476#1477#0" expanded="true" />
+            <element signature="e#1542#1543#0" expanded="true" />
+            <element signature="e#1569#1570#0" expanded="true" />
+            <element signature="e#1638#1639#0" expanded="true" />
+            <element signature="e#1665#1666#0" expanded="true" />
+            <element signature="e#1733#1734#0" expanded="true" />
+            <element signature="e#1760#1761#0" expanded="true" />
+            <element signature="e#1827#1828#0" expanded="true" />
+            <element signature="e#1854#1855#0" expanded="true" />
+            <element signature="e#1930#1931#0" expanded="true" />
+            <element signature="e#1957#1958#0" expanded="true" />
+            <element signature="e#2026#2027#0" expanded="true" />
+            <element signature="e#2053#2054#0" expanded="true" />
+            <element signature="e#2129#2130#0" expanded="true" />
+            <element signature="e#2156#2157#0" expanded="true" />
+            <element signature="e#2223#2224#0" expanded="true" />
+            <element signature="e#2250#2251#0" expanded="true" />
+            <element signature="e#2322#2323#0" expanded="true" />
+            <element signature="e#2349#2350#0" expanded="true" />
+            <element signature="e#2418#2419#0" expanded="true" />
+            <element signature="e#2445#2446#0" expanded="true" />
+            <element signature="e#2518#2519#0" expanded="true" />
+            <element signature="e#2545#2546#0" expanded="true" />
+            <element signature="e#2614#2615#0" expanded="true" />
+            <element signature="e#2641#2642#0" expanded="true" />
+            <element signature="e#2713#2714#0" expanded="true" />
+            <element signature="e#2740#2741#0" expanded="true" />
+            <element signature="e#2812#2813#0" expanded="true" />
+            <element signature="e#2839#2840#0" expanded="true" />
+            <element signature="e#2916#2917#0" expanded="true" />
+            <element signature="e#2943#2944#0" expanded="true" />
+            <element signature="e#3018#3019#0" expanded="true" />
+            <element signature="e#3045#3046#0" expanded="true" />
+            <element signature="e#3125#3126#0" expanded="true" />
+            <element signature="e#3152#3153#0" expanded="true" />
+            <element signature="e#3218#3219#0" expanded="true" />
+            <element signature="e#3245#3246#0" expanded="true" />
+            <element signature="e#3312#3313#0" expanded="true" />
+            <element signature="e#3339#3340#0" expanded="true" />
+            <element signature="e#3410#3411#0" expanded="true" />
+            <element signature="e#3437#3438#0" expanded="true" />
+            <element signature="e#3504#3505#0" expanded="true" />
+            <element signature="e#3531#3532#0" expanded="true" />
+            <element signature="e#3603#3604#0" expanded="true" />
+            <element signature="e#3630#3631#0" expanded="true" />
+            <element signature="e#3704#3705#0" expanded="true" />
+            <element signature="e#3731#3732#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="9" column="11" lean-forward="false" selection-start-line="9" selection-start-column="11" selection-end-line="9" selection-end-column="11" />
           <folding />
         </state>
       </provider>
