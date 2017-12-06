@@ -5,13 +5,11 @@ import java.util.Set;
 
 public class Representer implements CCALParserVisitor {
 
-    String label = "L0";
-    String prevLabel;
-    int curTempCount = 0;
-    int paramCount = 0;
-    int labelCount = 0;
-    HashMap<String, ArrayList<ThreeAddressCode>> addrCode = new HashMap<>();
-    HashMap<String, String> jumpLabelMap = new HashMap<>();
+    private String currentLable = "L0";
+    private String previousLable;
+    private int labelCount = 0;
+    private HashMap<String, ArrayList<ThreeAddressCode>> addrCode = new HashMap<>();
+    private HashMap<String, String> jumpLables = new HashMap<>();
 
     @Override
     public Object visit(SimpleNode node, Object data) {
@@ -21,40 +19,35 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTProgramme node, Object data) {
-        System.out.println("***************************");
-
-        System.out.println();
-
-        System.out.println("**** IR using 3-address code ****");
+        System.out.println("---- 3-address code representation ----");
         node.childrenAccept(this, data);
 
         Set keys = addrCode.keySet();
         if(keys.size() > 0) {
-            Iterator iter = keys.iterator();
-            while(iter.hasNext()) {
-                String s = (String) iter.next();
+            for (Object key : keys) {
+                String s = (String) key;
                 ArrayList<ThreeAddressCode> a = addrCode.get(s);
                 System.out.println(s);
-                for(int i=0; i<a.size(); i++) {
-                    System.out.println(" " + a.get(i).toString());
+                for (ThreeAddressCode threeAddressCode : a) {
+                    System.out.println(" " + threeAddressCode.toString());
                 }
             }
         } else {
             System.out.println("Nothing declared");
         }
-        System.out.println("*********************************");
+        System.out.println("---- End 3-address code representation ----");
 
         return null;
     }
 
     @Override
     public Object visit(ASTMain node, Object data) {
-        prevLabel = label;
-        label = "L" + (labelCount + 1);
+        previousLable = currentLable;
+        currentLable = "L" + (labelCount + 1);
 
         node.childrenAccept(this, data);
 
-        label = prevLabel;
+        currentLable = previousLable;
         labelCount++;
 
         return null;
@@ -68,25 +61,25 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTFunction node, Object data) {
-        prevLabel = label;
-        label = "L" + (labelCount + 1);
+        previousLable = currentLable;
+        currentLable = "L" + (labelCount + 1);
 
-        jumpLabelMap.put((String) node.jjtGetChild(1).jjtAccept(this, null), label);
+        jumpLables.put((String) node.jjtGetChild(1).jjtAccept(this, null), currentLable);
 
         node.childrenAccept(this, data);
 
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ret = new ThreeAddressCode();
-        ret.addr1 = "return";
+        ThreeAddressCode returnAddressCode = new ThreeAddressCode();
+        returnAddressCode.setAddress1("return");
 
-        allAc.add(ret);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(returnAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
-        label = prevLabel;
+        currentLable = previousLable;
         labelCount++;
 
         return null;
@@ -121,20 +114,18 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTConstDeclaration node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if (allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if (currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
         ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = "=";
-        ac.addr2 = (String) node.jjtGetChild(0).jjtAccept(this, null);
-        ac.addr3 = (String) node.jjtGetChild(1).jjtAccept(this, null);
-        ac.addr4 = (String) node.jjtGetChild(2).jjtAccept(this, null);
-
-        allAc.add(ac);
-        addrCode.put(label, allAc);
-
+        ac.setAddress1("=");
+        ac.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        ac.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        ac.setAddress4(node.jjtGetChild(2).jjtAccept(this, null).toString());
+        currentAddressCodes.add(ac);
+        addrCode.put(currentLable, currentAddressCodes);
         return null;
     }
 
@@ -169,59 +160,59 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTSkip node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = "Skip";
+        ThreeAddressCode skipAddressCode = new ThreeAddressCode();
+        skipAddressCode.setAddress1("Skip");
 
-        allAc.add(ac);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(skipAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTNot node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = "~" + getBooleanOperator(node.jjtGetChild(0));
-        ac.addr2 = (String) node.jjtGetChild(0).jjtGetChild(0).jjtAccept(this, null);
-        ac.addr3 = (String) node.jjtGetChild(0).jjtGetChild(1).jjtAccept(this, null);
+        ThreeAddressCode notAddressCode = new ThreeAddressCode();
+        notAddressCode.setAddress1("~" + getBooleanOperator(node.jjtGetChild(0)));
+        notAddressCode.setAddress2(node.jjtGetChild(0).jjtGetChild(0).jjtAccept(this, null).toString());
+        notAddressCode.setAddress3(node.jjtGetChild(0).jjtGetChild(1).jjtAccept(this, null).toString());
 
-        allAc.add(ac);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(notAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTFunctionCall node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ac1 = new ThreeAddressCode();
-        ac1.addr1 = "funcCall";
-        ac1.addr2 = (String) node.jjtGetChild(0).jjtAccept(this, null);
+        ThreeAddressCode functionCallAddressCode = new ThreeAddressCode();
+        functionCallAddressCode.setAddress1("functionCall");
+        functionCallAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
         if(node.jjtGetNumChildren() > 1) {
-            ac1.addr3 = (String) node.jjtGetChild(1).jjtGetChild(0).jjtGetChild(0).jjtAccept(this, null);
+            functionCallAddressCode.setAddress3(node.jjtGetChild(1).jjtGetChild(0).jjtGetChild(0).jjtAccept(this, null).toString());
         }
-        allAc.add(ac1);
+        currentAddressCodes.add(functionCallAddressCode);
 
-        ThreeAddressCode ac2 = new ThreeAddressCode();
-        ac2.addr1 = "goto";
-        ac2.addr2 = jumpLabelMap.get((String) node.jjtGetChild(0).jjtAccept(this,null));
+        ThreeAddressCode gotoAddressCode = new ThreeAddressCode();
+        gotoAddressCode.setAddress1("goto");
+        gotoAddressCode.setAddress2(jumpLables.get(node.jjtGetChild(0).jjtAccept(this,null)));
 
-        allAc.add(ac2);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(gotoAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
         return null;
     }
@@ -258,144 +249,144 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTEqual node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = "==";
-        ac.addr2 = (String) node.jjtGetChild(0).jjtAccept(this, null);
-        ac.addr3 = (String) node.jjtGetChild(1).jjtAccept(this, null);
+        ThreeAddressCode equalAddressCode = new ThreeAddressCode();
+        equalAddressCode.setAddress1("==");
+        equalAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        equalAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
-        allAc.add(ac);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(equalAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTNotEqual node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = "!=";
-        ac.addr2 = (String) node.jjtGetChild(0).jjtAccept(this, null);
-        ac.addr3 = (String) node.jjtGetChild(1).jjtAccept(this, null);
+        ThreeAddressCode notEqualAddressCode = new ThreeAddressCode();
+        notEqualAddressCode.setAddress1("!=");
+        notEqualAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        notEqualAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
-        allAc.add(ac);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(notEqualAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTLessThan node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = "<";
-        ac.addr2 = (String) node.jjtGetChild(0).jjtAccept(this, null);
-        ac.addr3 = (String) node.jjtGetChild(1).jjtAccept(this, null);
+        ThreeAddressCode lessThanAddressCode = new ThreeAddressCode();
+        lessThanAddressCode.setAddress1("<");
+        lessThanAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        lessThanAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
-        allAc.add(ac);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(lessThanAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTLessThanEqual node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = "<=";
-        ac.addr2 = (String) node.jjtGetChild(0).jjtAccept(this, null);
-        ac.addr3 = (String) node.jjtGetChild(1).jjtAccept(this, null);
+        ThreeAddressCode lessThanEqualAddressCode = new ThreeAddressCode();
+        lessThanEqualAddressCode.setAddress1("<=");
+        lessThanEqualAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        lessThanEqualAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
-        allAc.add(ac);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(lessThanEqualAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTGreaterThan node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = ">";
-        ac.addr2 = (String) node.jjtGetChild(0).jjtAccept(this, null);
-        ac.addr3 = (String) node.jjtGetChild(1).jjtAccept(this, null);
+        ThreeAddressCode greaterThanAddressCode = new ThreeAddressCode();
+        greaterThanAddressCode.setAddress1(">");
+        greaterThanAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        greaterThanAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
-        allAc.add(ac);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(greaterThanAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTGreaterThanEqual node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = ">=";
-        ac.addr2 = (String) node.jjtGetChild(0).jjtAccept(this, null);
-        ac.addr3 = (String) node.jjtGetChild(1).jjtAccept(this, null);
+        ThreeAddressCode greaterThanEqualAddressCode = new ThreeAddressCode();
+        greaterThanEqualAddressCode.setAddress1(">=");
+        greaterThanEqualAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        greaterThanEqualAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
-        allAc.add(ac);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(greaterThanEqualAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTOr node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = "||";
-        ac.addr2 = (String) node.jjtGetChild(0).jjtAccept(this, null);
-        ac.addr3 = (String) node.jjtGetChild(1).jjtAccept(this, null);
+        ThreeAddressCode orAddressCode = new ThreeAddressCode();
+        orAddressCode.setAddress1("||");
+        orAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        orAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
-        allAc.add(ac);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(orAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTAnd node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = "&&";
-        ac.addr2 = (String) node.jjtGetChild(0).jjtAccept(this, null);
-        ac.addr3 = (String) node.jjtGetChild(1).jjtAccept(this, null);
+        ThreeAddressCode andAddressCode = new ThreeAddressCode();
+        andAddressCode.setAddress1("&&");
+        andAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        andAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
-        allAc.add(ac);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(andAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
         return null;
     }
@@ -407,62 +398,75 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTAdd node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = "+";
-        ac.addr2 = (String) node.jjtGetChild(0).jjtAccept(this, null);
-        ac.addr3 = (String) node.jjtGetChild(1).jjtAccept(this, null);
+        ThreeAddressCode addAddressCode = new ThreeAddressCode();
+        addAddressCode.setAddress1("+");
+        addAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        addAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
-        allAc.add(ac);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(addAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTSubtract node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = "-";
-        ac.addr2 = (String) node.jjtGetChild(0).jjtAccept(this, null);
-        ac.addr3 = (String) node.jjtGetChild(1).jjtAccept(this, null);
+        ThreeAddressCode subtractAddressCode = new ThreeAddressCode();
+        subtractAddressCode.setAddress1("-");
+        subtractAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        subtractAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
-        allAc.add(ac);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(subtractAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTAssignment node, Object data) {
-        ArrayList<ThreeAddressCode> allAc = addrCode.get(label);
-        if(allAc == null) {
-            allAc = new ArrayList<>();
+        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
         }
 
-        ThreeAddressCode ac = new ThreeAddressCode();
-        ac.addr1 = "=";
-        ac.addr2 = (String) node.jjtGetChild(0).jjtAccept(this, null);
-        ac.addr3 = (String) node.jjtGetChild(1).jjtAccept(this, null);
+        ThreeAddressCode asignAddressCode = new ThreeAddressCode();
+        asignAddressCode.setAddress1("=");
+        asignAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+
         if(node.jjtGetChild(1) instanceof ASTFunctionCall){
-            ac.addr3 = (String) node.jjtGetChild(1).jjtGetChild(0).jjtAccept(this, null);
+            asignAddressCode.setAddress3(node.jjtGetChild(1).jjtGetChild(0).jjtAccept(this, null).toString());
+        } else if(node.jjtGetChild(1) instanceof ASTSubtract){ //we need a quadruple to represent this operation and what it stores into
+            asignAddressCode.setAddress4(node.jjtGetChild(0).jjtAccept(this, null).toString());
+            asignAddressCode.setAddress1("-");
+            asignAddressCode.setAddress2(node.jjtGetChild(1).jjtGetChild(0).jjtAccept(this, null).toString());
+            asignAddressCode.setAddress3(node.jjtGetChild(1).jjtGetChild(1).jjtAccept(this, null).toString());
+        } else if(node.jjtGetChild(1) instanceof ASTAdd ){
+            asignAddressCode.setAddress4(node.jjtGetChild(0).jjtAccept(this, null).toString());
+            asignAddressCode.setAddress1("+");
+            asignAddressCode.setAddress2(node.jjtGetChild(1).jjtGetChild(0).jjtAccept(this, null).toString());
+            asignAddressCode.setAddress3(node.jjtGetChild(1).jjtGetChild(1).jjtAccept(this, null).toString());
+        }else{
+            asignAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
         }
 
-        allAc.add(ac);
-        addrCode.put(label, allAc);
+        currentAddressCodes.add(asignAddressCode);
+        addrCode.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
-    public String getBooleanOperator(Node node){
+    //Get boolean operators for the notAddressCode
+    private String getBooleanOperator(Node node){
         if (node instanceof ASTAnd) {
             return "&&";
         } else if (node instanceof ASTOr) {
