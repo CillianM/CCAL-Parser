@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 
 public class Representer implements CCALParserVisitor {
@@ -8,6 +7,9 @@ public class Representer implements CCALParserVisitor {
     private String currentLable = "L0";
     private String previousLable;
     private int labelCount = 0;
+    private ThreeAddressCode T1 = new ThreeAddressCode();
+    private ThreeAddressCode T2 = new ThreeAddressCode();
+    private ThreeAddressCode T3 = new ThreeAddressCode();
     private HashMap<String, ArrayList<ThreeAddressCode>> addrCode = new HashMap<>();
     private HashMap<String, String> jumpLables = new HashMap<>();
 
@@ -19,6 +21,9 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTProgramme node, Object data) {
+        T1.setAddress2("T1");
+        T2.setAddress2("T2");
+        T3.setAddress2("T3");
         System.out.println("---- 3-address code representation ----");
         node.childrenAccept(this, data);
 
@@ -406,7 +411,12 @@ public class Representer implements CCALParserVisitor {
         ThreeAddressCode addAddressCode = new ThreeAddressCode();
         addAddressCode.setAddress1("+");
         addAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
-        addAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        if(!(node.jjtGetChild(1) instanceof ASTVariable) && !(node.jjtGetChild(1) instanceof ASTDigit && !(node.jjtGetChild(1) instanceof ASTBoolean))){
+            node.childrenAccept(this, data);
+        }
+        else {
+            addAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        }
 
         currentAddressCodes.add(addAddressCode);
         addrCode.put(currentLable, currentAddressCodes);
@@ -424,7 +434,12 @@ public class Representer implements CCALParserVisitor {
         ThreeAddressCode subtractAddressCode = new ThreeAddressCode();
         subtractAddressCode.setAddress1("-");
         subtractAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
-        subtractAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        if(!(node.jjtGetChild(1) instanceof ASTVariable) && !(node.jjtGetChild(1) instanceof ASTDigit && !(node.jjtGetChild(1) instanceof ASTBoolean))){
+            node.childrenAccept(this, data);
+        }
+        else {
+            subtractAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        }
 
         currentAddressCodes.add(subtractAddressCode);
         addrCode.put(currentLable, currentAddressCodes);
@@ -443,19 +458,10 @@ public class Representer implements CCALParserVisitor {
         asignAddressCode.setAddress1("=");
         asignAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
 
-        if(node.jjtGetChild(1) instanceof ASTFunctionCall){
-            asignAddressCode.setAddress3(node.jjtGetChild(1).jjtGetChild(0).jjtAccept(this, null).toString());
-        } else if(node.jjtGetChild(1) instanceof ASTSubtract){ //we need a quadruple to represent this operation and what it stores into
-            asignAddressCode.setAddress4(node.jjtGetChild(0).jjtAccept(this, null).toString());
-            asignAddressCode.setAddress1("-");
-            asignAddressCode.setAddress2(node.jjtGetChild(1).jjtGetChild(0).jjtAccept(this, null).toString());
-            asignAddressCode.setAddress3(node.jjtGetChild(1).jjtGetChild(1).jjtAccept(this, null).toString());
-        } else if(node.jjtGetChild(1) instanceof ASTAdd ){
-            asignAddressCode.setAddress4(node.jjtGetChild(0).jjtAccept(this, null).toString());
-            asignAddressCode.setAddress1("+");
-            asignAddressCode.setAddress2(node.jjtGetChild(1).jjtGetChild(0).jjtAccept(this, null).toString());
-            asignAddressCode.setAddress3(node.jjtGetChild(1).jjtGetChild(1).jjtAccept(this, null).toString());
-        }else{
+        if(!(node.jjtGetChild(1) instanceof ASTVariable) && !(node.jjtGetChild(1) instanceof ASTDigit && !(node.jjtGetChild(1) instanceof ASTBoolean))){
+            node.childrenAccept(this, data);
+        }
+        else{
             asignAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
         }
 

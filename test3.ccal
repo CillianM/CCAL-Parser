@@ -1,11 +1,11 @@
 var i:integer;
 const five : integer = 5;
 const test : boolean = true;
-integer test_fn (x:integer) is
+integer test_fn (x:integer,y:integer) is
   var i:integer;
 begin
   i = 2;
-  i = i + x;
+  i = i + x + y;
   return (x);
 end
 
@@ -21,5 +21,5 @@ begin
   begin
     isTrue = false;
   end
-  i = test_fn (i);
+  i = test_fn (i,i);
 end

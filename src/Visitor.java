@@ -12,12 +12,12 @@ public class Visitor implements CCALParserVisitor {
     private String currentScope = PROGRAMME;
     private String previousScope;
     //Is every variable both written to and read from?
-    private int variablesNotWritten = 0;
-    private int variablesNotRead = 0;
     //Is every function called?
     private int functionsNotCalled = 0;
     //Easy way to keep track of all error messages to be printed out at the end
     private List<ErrorMessage> errorList = new ArrayList<>();
+    private List<String> variablesNotRead = new ArrayList<>();
+    private List<String> variablesNotWritten = new ArrayList<>();
 
     @Override
     public Object visit(SimpleNode node, Object data) {
@@ -57,12 +57,12 @@ public class Visitor implements CCALParserVisitor {
                         System.out.println(" Values: " + currentSymbol.printValues()); //print out all assignments of this variable
                     } else {
                         System.out.println(" Values: No assignments made"); //Variable has not been written to, update counter
-                        variablesNotWritten++;
+                        variablesNotWritten.add(currentSymbol.getName().image);
                     }
                     System.out.println(" Is written to?: " + (currentSymbol.getValues().size() > 0));
                     System.out.println(" Is read from?: " + currentSymbol.getIsRead());
                     if (!currentSymbol.getIsRead()) {
-                        variablesNotRead++;
+                        variablesNotRead.add(currentSymbol.getName().image);
                     }
                 }
             }
@@ -575,7 +575,6 @@ public class Visitor implements CCALParserVisitor {
                 currentScopeSymbolTable.put(variableName.image, variableSymbol);
                 symbolTable.put(currentScope, currentScopeSymbolTable);
             } else if (assignedNode instanceof ASTFunctionCall ||
-                    assignedNode instanceof ASTPos ||
                     assignedNode instanceof ASTMinus) {
                 Token functionToken = (Token) assignedNode.jjtGetChild(0).jjtAccept(this, null);
                 // if its initial value has already been stored, leave it
@@ -583,26 +582,7 @@ public class Visitor implements CCALParserVisitor {
                 variableSymbol.addValue(functionToken.image, variable);
                 currentScopeSymbolTable.put(variableName.image, variableSymbol);
                 symbolTable.put(currentScope, currentScopeSymbolTable);
-            } else if (assignedNode instanceof ASTAdd || assignedNode instanceof ASTSubtract) {
-                Token leftToken = (Token) assignedNode.jjtGetChild(0).jjtAccept(this, null);
-                Token rightToken = (Token) assignedNode.jjtGetChild(1).jjtAccept(this, null);
-                // if its initial value has already been stored, leave it
-                String operator = "-";
-                if (assignedNode instanceof ASTAdd)
-                    operator = "+";
-                Variable variable1 = new Variable(variableSymbol.getType().toString(), leftToken.toString() + operator + rightToken.toString());
-                variableSymbol.addValue(leftToken.image, variable1);
-                currentScopeSymbolTable.put(variableName.image, variableSymbol);
-                symbolTable.put(currentScope, currentScopeSymbolTable);
-
-                //update tokens if variables
-                if (assignedNode.jjtGetChild(0) instanceof ASTVariable) {
-                    setAsReadAndCalled(leftToken);
-                }
-                if (assignedNode.jjtGetChild(1) instanceof ASTVariable) {
-                    setAsReadAndCalled(rightToken);
-                }
-            } else {
+            }  else {
                 node.childrenAccept(this, data);
             }
         } else {
@@ -640,11 +620,23 @@ public class Visitor implements CCALParserVisitor {
         if (functionsNotCalled > 0) {
             System.out.println(functionsNotCalled + " function(s) are declared but not used.");
         }
-        if (variablesNotWritten > 0) {
-            System.out.println(variablesNotWritten + " variable(s) have not been initialised.");
+        if (variablesNotWritten.size() > 0) {
+            StringBuilder notWrittenVariables = new StringBuilder();
+            System.out.println(variablesNotWritten.size() + " variable(s) have not been initialised:");
+            for(String variable: variablesNotWritten){
+                notWrittenVariables.append(variable).append(",");
+            }
+            notWrittenVariables.deleteCharAt(notWrittenVariables.length()-1);
+            System.out.println(notWrittenVariables.toString());
         }
-        if (variablesNotRead > 0) {
-            System.out.println(variablesNotRead + " variable(s) have not been accessed.");
+        if (variablesNotRead.size() > 0) {
+            StringBuilder notReadVariables = new StringBuilder();
+            System.out.println(variablesNotRead.size() + " variable(s) have not been accessed:");
+            for(String variable: variablesNotRead){
+                notReadVariables.append(variable).append(",");
+            }
+            notReadVariables.deleteCharAt(notReadVariables.length()-1);
+            System.out.println(notReadVariables.toString());
         }
     }
 
