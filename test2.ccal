@@ -1,9 +1,12 @@
-void func () is
+integer addTwo (i:integer) is
+var x:integer;
 begin
-  return ();
+  i = i + 2;
+  return (i);
 end
 
 main
 begin
-  func ();
+  const x : integer = 5;
+  x = addTwo (x);
 end

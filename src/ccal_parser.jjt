@@ -318,8 +318,8 @@ void boolOp ( ) #Boolean: { Token t; }
 
 void binOp ( ) : {}
 {
-    ( <PLUS> expression() #Add(2) |
-      <MINUS> expression() #Subtract(2) |
+    ( <PLUS> fragment() #Add(2) |
+      <MINUS> fragment() #Subtract(2) |
       {} )
 }
 

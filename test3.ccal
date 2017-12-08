@@ -5,7 +5,7 @@ integer test_fn (x:integer,y:integer) is
   var i:integer;
 begin
   i = 2;
-  i = i + x + y;
+  i = 2 + x;
   return (x);
 end
 

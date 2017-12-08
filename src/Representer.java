@@ -6,11 +6,8 @@ public class Representer implements CCALParserVisitor {
 
     private String currentLable = "L0";
     private String previousLable;
-    private int labelCount = 0;
-    private ThreeAddressCode T1 = new ThreeAddressCode();
-    private ThreeAddressCode T2 = new ThreeAddressCode();
-    private ThreeAddressCode T3 = new ThreeAddressCode();
-    private HashMap<String, ArrayList<ThreeAddressCode>> addrCode = new HashMap<>();
+    private int labelCount = 0; //Kep track of amount of labels
+    private HashMap<String, ArrayList<ThreeAddressCode>> addressCodes = new HashMap<>();
     private HashMap<String, String> jumpLables = new HashMap<>();
 
     @Override
@@ -21,17 +18,14 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTProgramme node, Object data) {
-        T1.setAddress2("T1");
-        T2.setAddress2("T2");
-        T3.setAddress2("T3");
         System.out.println("---- 3-address code representation ----");
         node.childrenAccept(this, data);
 
-        Set keys = addrCode.keySet();
+        Set keys = addressCodes.keySet();
         if(keys.size() > 0) {
             for (Object key : keys) {
                 String s = (String) key;
-                ArrayList<ThreeAddressCode> a = addrCode.get(s);
+                ArrayList<ThreeAddressCode> a = addressCodes.get(s);
                 System.out.println(s);
                 for (ThreeAddressCode threeAddressCode : a) {
                     System.out.println(" " + threeAddressCode.toString());
@@ -73,7 +67,7 @@ public class Representer implements CCALParserVisitor {
 
         node.childrenAccept(this, data);
 
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -82,7 +76,7 @@ public class Representer implements CCALParserVisitor {
         returnAddressCode.setAddress1("return");
 
         currentAddressCodes.add(returnAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         currentLable = previousLable;
         labelCount++;
@@ -119,7 +113,7 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTConstDeclaration node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if (currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -130,7 +124,7 @@ public class Representer implements CCALParserVisitor {
         ac.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
         ac.setAddress4(node.jjtGetChild(2).jjtAccept(this, null).toString());
         currentAddressCodes.add(ac);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
         return null;
     }
 
@@ -165,7 +159,7 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTSkip node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -174,14 +168,14 @@ public class Representer implements CCALParserVisitor {
         skipAddressCode.setAddress1("Skip");
 
         currentAddressCodes.add(skipAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTNot node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -192,14 +186,14 @@ public class Representer implements CCALParserVisitor {
         notAddressCode.setAddress3(node.jjtGetChild(0).jjtGetChild(1).jjtAccept(this, null).toString());
 
         currentAddressCodes.add(notAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTFunctionCall node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -217,7 +211,7 @@ public class Representer implements CCALParserVisitor {
         gotoAddressCode.setAddress2(jumpLables.get(node.jjtGetChild(0).jjtAccept(this,null)));
 
         currentAddressCodes.add(gotoAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         return null;
     }
@@ -254,7 +248,7 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTEqual node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -265,14 +259,14 @@ public class Representer implements CCALParserVisitor {
         equalAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
         currentAddressCodes.add(equalAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTNotEqual node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -283,14 +277,14 @@ public class Representer implements CCALParserVisitor {
         notEqualAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
         currentAddressCodes.add(notEqualAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTLessThan node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -301,14 +295,14 @@ public class Representer implements CCALParserVisitor {
         lessThanAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
         currentAddressCodes.add(lessThanAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTLessThanEqual node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -319,14 +313,14 @@ public class Representer implements CCALParserVisitor {
         lessThanEqualAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
         currentAddressCodes.add(lessThanEqualAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTGreaterThan node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -337,14 +331,14 @@ public class Representer implements CCALParserVisitor {
         greaterThanAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
         currentAddressCodes.add(greaterThanAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTGreaterThanEqual node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -355,14 +349,14 @@ public class Representer implements CCALParserVisitor {
         greaterThanEqualAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
         currentAddressCodes.add(greaterThanEqualAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTOr node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -373,14 +367,14 @@ public class Representer implements CCALParserVisitor {
         orAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
         currentAddressCodes.add(orAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTAnd node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -391,7 +385,7 @@ public class Representer implements CCALParserVisitor {
         andAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
 
         currentAddressCodes.add(andAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         return null;
     }
@@ -403,7 +397,7 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTAdd node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -419,14 +413,14 @@ public class Representer implements CCALParserVisitor {
         }
 
         currentAddressCodes.add(addAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTSubtract node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -442,14 +436,14 @@ public class Representer implements CCALParserVisitor {
         }
 
         currentAddressCodes.add(subtractAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         return null;
     }
 
     @Override
     public Object visit(ASTAssignment node, Object data) {
-        ArrayList<ThreeAddressCode> currentAddressCodes = addrCode.get(currentLable);
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
         if(currentAddressCodes == null) {
             currentAddressCodes = new ArrayList<>();
         }
@@ -458,15 +452,16 @@ public class Representer implements CCALParserVisitor {
         asignAddressCode.setAddress1("=");
         asignAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
 
-        if(!(node.jjtGetChild(1) instanceof ASTVariable) && !(node.jjtGetChild(1) instanceof ASTDigit && !(node.jjtGetChild(1) instanceof ASTBoolean))){
+        if(!(node.jjtGetChild(1) instanceof ASTVariable) && !(node.jjtGetChild(1) instanceof ASTDigit) && !(node.jjtGetChild(1) instanceof ASTBoolean)){
             node.childrenAccept(this, data);
+            currentAddressCodes = addressCodes.get(currentLable);
         }
         else{
             asignAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
         }
 
         currentAddressCodes.add(asignAddressCode);
-        addrCode.put(currentLable, currentAddressCodes);
+        addressCodes.put(currentLable, currentAddressCodes);
 
         return null;
     }
