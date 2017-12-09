@@ -471,13 +471,13 @@ public class Visitor implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTOr node, Object data) {
-        isValidBooleanComparison(node, data);
+        isValidBooleanOperation(node, data);
         return null;
     }
 
     @Override
     public Object visit(ASTAnd node, Object data) {
-        isValidBooleanComparison(node, data);
+        isValidBooleanOperation(node, data);
         return null;
     }
 
@@ -636,16 +636,51 @@ public class Visitor implements CCALParserVisitor {
 
     //Evaluate boolean comparison (AND & OR) node and return if their are children nodes to go down
     private void isValidBooleanComparison(Node parentNode, Object data) {
-        Node leftNode = parentNode.jjtGetChild(0);
-        Token leftToken = (Token) parentNode.jjtGetChild(0).jjtAccept(this, null);
-        if (checkBooleanComparison(leftNode, leftToken)) {
-            evaluateChildCondition(parentNode, data);
+        Node node1 = (Node) parentNode.jjtGetChild(0);
+        Token child1 = (Token) parentNode.jjtGetChild(0).jjtAccept(this, null);
+        if(node1 instanceof ASTVariable) {
+            // check if var or const has been declared before
+            Symbol child1Stc = symbolTable.get(currentScope).get(child1.image);
+            if(child1Stc == null) {
+                child1Stc = symbolTable.get("Program").get(child1.image);
+            }
+            if(child1Stc == null) {
+                errorList.add(new ErrorMessage(child1.beginLine,child1.beginColumn,"Variable or Const \"" + child1.image + "\" not declared in scope \"" + currentScope + "\" or \"Program\""));
+            } else if(child1Stc.getValues().size() == 0 && !child1Stc.getSymbolType().equals(SymbolType.PARAM)) {
+                    errorList.add(new ErrorMessage(child1.beginLine,child1.beginColumn,"Variable \"" + child1.image + "\" has no value in scope \"" + currentScope + "\""));
+            } else if(!child1Stc.getType().image.equals("boolean")) {
+                // error if is not a boolean
+                errorList.add(new ErrorMessage(child1.beginLine,child1.beginColumn,child1Stc.getSymbolType() + " \"" + child1.image + "\" is not of type boolean"));
+            }
+        } else if(node1 instanceof ASTDigit) {
+            // error if number
+            errorList.add(new ErrorMessage(child1.beginLine,child1.beginColumn,"Cannot create AND value using \"" + child1.image + "\" (Type number)"));
+        } else if(!(node1 instanceof ASTBoolean)) {
+            evaluateChildCondition(parentNode,data);
         }
 
-        Node rightNode = parentNode.jjtGetChild(1);
-        Token rightToken = (Token) parentNode.jjtGetChild(1).jjtAccept(this, null);
-        if (checkBooleanComparison(rightNode, rightToken)) {
-            evaluateChildCondition(parentNode, data);
+        Node node2 = (Node) parentNode.jjtGetChild(1);
+        Token child2 = (Token) parentNode.jjtGetChild(1).jjtAccept(this, null);
+        if(node2 instanceof ASTVariable) {
+            // check if var or const has been declared before
+            Symbol child2Stc = symbolTable.get(currentScope).get(child2.image);
+            if(child2Stc == null) {
+                child2Stc = symbolTable.get("Program").get(child2.image);
+            }
+            if(child2Stc == null) {
+                errorList.add(new ErrorMessage(child1.beginLine,child1.beginColumn,"Variable or Const \"" + child1.image + "\" not declared in scope \"" + currentScope + "\" or \"Program\""));
+
+            } else if(child2Stc.getValues().size() == 0 && !child2Stc.getSymbolType().equals(SymbolType.PARAM)) {
+                errorList.add(new ErrorMessage(child2.beginLine,child2.beginColumn,"Variable \"" + child2.image + "\" has no value in scope \"" + currentScope + "\""));
+            } else if(!child2Stc.getType().image.equals("boolean")) {
+                errorList.add(new ErrorMessage(child2.beginLine,child2.beginColumn,child2Stc.getSymbolType() + " \"" + child1.image + "\" is not of type boolean"));
+            }
+        } else if(node2 instanceof ASTDigit) {
+            // error if number
+            errorList.add(new ErrorMessage(child2.beginLine,child2.beginColumn,"Cannot create AND value using \"" + child2.image + "\" (Type number)"));
+
+        } else if(!(node2 instanceof ASTBoolean)) {
+            evaluateChildCondition(parentNode,data);
         }
     }
 

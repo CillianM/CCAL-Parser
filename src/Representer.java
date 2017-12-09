@@ -41,8 +41,8 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTMain node, Object data) {
-        previousLable = currentLable;
         currentLable = "L" + (labelCount + 1);
+        previousLable = currentLable;
 
         node.childrenAccept(this, data);
 
@@ -173,13 +173,13 @@ public class Representer implements CCALParserVisitor {
         returnAddressCode.setAddress1("if");
         currentAddressCodes.add(returnAddressCode);
         labelCount++;
+        String ifLable = currentLable;
         node.childrenAccept(this, node);
 
-        currentLable = previousLable;
+        currentLable = ifLable;
         String ifJumpLable = "L" + (labelCount - 1);
         String elseJumpLable = "L" + (labelCount);
-        labelCount++;
-        String jumpToLable = "L" + (labelCount);
+        String jumpToLable = "L" + (labelCount + 1);
         addressCodes.put(currentLable, currentAddressCodes);
         ThreeAddressCode gotoIf = new ThreeAddressCode();
         gotoIf.setAddress1("goto");
@@ -368,8 +368,18 @@ public class Representer implements CCALParserVisitor {
 
         ThreeAddressCode equalAddressCode = new ThreeAddressCode();
         equalAddressCode.setAddress1("==");
-        equalAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
-        equalAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        if(node.jjtGetChild(0) instanceof ASTDigit || node.jjtGetChild(0) instanceof ASTBoolean || node.jjtGetChild(0) instanceof ASTVariable) {
+            equalAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        }
+        else{
+            node.childrenAccept(this, data);
+        }
+        if(node.jjtGetChild(1) instanceof ASTDigit || node.jjtGetChild(1) instanceof ASTBoolean || node.jjtGetChild(1) instanceof ASTVariable) {
+            equalAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        }
+        else {
+            node.childrenAccept(this, data);
+        }
 
         currentAddressCodes.add(equalAddressCode);
         addressCodes.put(currentLable, currentAddressCodes);
@@ -386,8 +396,18 @@ public class Representer implements CCALParserVisitor {
 
         ThreeAddressCode notEqualAddressCode = new ThreeAddressCode();
         notEqualAddressCode.setAddress1("!=");
-        notEqualAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
-        notEqualAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        if(node.jjtGetChild(0) instanceof ASTDigit || node.jjtGetChild(0) instanceof ASTBoolean || node.jjtGetChild(0) instanceof ASTVariable) {
+            notEqualAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        }
+        else{
+            node.childrenAccept(this, data);
+        }
+        if(node.jjtGetChild(1) instanceof ASTDigit || node.jjtGetChild(1) instanceof ASTBoolean || node.jjtGetChild(1) instanceof ASTVariable) {
+            notEqualAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        }
+        else {
+            node.childrenAccept(this, data);
+        }
 
         currentAddressCodes.add(notEqualAddressCode);
         addressCodes.put(currentLable, currentAddressCodes);
@@ -404,8 +424,18 @@ public class Representer implements CCALParserVisitor {
 
         ThreeAddressCode lessThanAddressCode = new ThreeAddressCode();
         lessThanAddressCode.setAddress1("<");
-        lessThanAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
-        lessThanAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        if(node.jjtGetChild(0) instanceof ASTDigit || node.jjtGetChild(0) instanceof ASTBoolean || node.jjtGetChild(0) instanceof ASTVariable) {
+            lessThanAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        }
+        else{
+            node.childrenAccept(this, data);
+        }
+        if(node.jjtGetChild(1) instanceof ASTDigit || node.jjtGetChild(1) instanceof ASTBoolean || node.jjtGetChild(1) instanceof ASTVariable) {
+            lessThanAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        }
+        else {
+            node.childrenAccept(this, data);
+        }
 
         currentAddressCodes.add(lessThanAddressCode);
         addressCodes.put(currentLable, currentAddressCodes);
@@ -422,8 +452,18 @@ public class Representer implements CCALParserVisitor {
 
         ThreeAddressCode lessThanEqualAddressCode = new ThreeAddressCode();
         lessThanEqualAddressCode.setAddress1("<=");
-        lessThanEqualAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
-        lessThanEqualAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        if(node.jjtGetChild(0) instanceof ASTDigit || node.jjtGetChild(0) instanceof ASTBoolean || node.jjtGetChild(0) instanceof ASTVariable) {
+            lessThanEqualAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        }
+        else{
+            node.childrenAccept(this, data);
+        }
+        if(node.jjtGetChild(1) instanceof ASTDigit || node.jjtGetChild(1) instanceof ASTBoolean || node.jjtGetChild(1) instanceof ASTVariable) {
+            lessThanEqualAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        }
+        else {
+            node.childrenAccept(this, data);
+        }
 
         currentAddressCodes.add(lessThanEqualAddressCode);
         addressCodes.put(currentLable, currentAddressCodes);
@@ -440,8 +480,18 @@ public class Representer implements CCALParserVisitor {
 
         ThreeAddressCode greaterThanAddressCode = new ThreeAddressCode();
         greaterThanAddressCode.setAddress1(">");
-        greaterThanAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
-        greaterThanAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        if(node.jjtGetChild(0) instanceof ASTDigit || node.jjtGetChild(0) instanceof ASTBoolean || node.jjtGetChild(0) instanceof ASTVariable) {
+            greaterThanAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        }
+        else{
+            node.childrenAccept(this, data);
+        }
+        if(node.jjtGetChild(1) instanceof ASTDigit || node.jjtGetChild(1) instanceof ASTBoolean || node.jjtGetChild(1) instanceof ASTVariable) {
+            greaterThanAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        }
+        else {
+            node.childrenAccept(this, data);
+        }
 
         currentAddressCodes.add(greaterThanAddressCode);
         addressCodes.put(currentLable, currentAddressCodes);
@@ -458,8 +508,18 @@ public class Representer implements CCALParserVisitor {
 
         ThreeAddressCode greaterThanEqualAddressCode = new ThreeAddressCode();
         greaterThanEqualAddressCode.setAddress1(">=");
-        greaterThanEqualAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
-        greaterThanEqualAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        if(node.jjtGetChild(0) instanceof ASTDigit || node.jjtGetChild(0) instanceof ASTBoolean || node.jjtGetChild(0) instanceof ASTVariable) {
+            greaterThanEqualAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        }
+        else{
+            node.childrenAccept(this, data);
+        }
+        if(node.jjtGetChild(1) instanceof ASTDigit || node.jjtGetChild(1) instanceof ASTBoolean || node.jjtGetChild(1) instanceof ASTVariable) {
+            greaterThanEqualAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        }
+        else {
+            node.childrenAccept(this, data);
+        }
 
         currentAddressCodes.add(greaterThanEqualAddressCode);
         addressCodes.put(currentLable, currentAddressCodes);
@@ -476,8 +536,18 @@ public class Representer implements CCALParserVisitor {
 
         ThreeAddressCode orAddressCode = new ThreeAddressCode();
         orAddressCode.setAddress1("||");
-        orAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
-        orAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        if(node.jjtGetChild(0) instanceof ASTDigit || node.jjtGetChild(0) instanceof ASTBoolean || node.jjtGetChild(0) instanceof ASTVariable) {
+            orAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        }
+        else{
+            node.childrenAccept(this, data);
+        }
+        if(node.jjtGetChild(1) instanceof ASTDigit || node.jjtGetChild(1) instanceof ASTBoolean || node.jjtGetChild(1) instanceof ASTVariable) {
+            orAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        }
+        else {
+            node.childrenAccept(this, data);
+        }
 
         currentAddressCodes.add(orAddressCode);
         addressCodes.put(currentLable, currentAddressCodes);

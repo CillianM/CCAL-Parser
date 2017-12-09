@@ -300,14 +300,15 @@ void type ( ) #TypeValue: { Token t; }
 //Comparison operators
 void comparisionOp () : {}
 {
-    <EQ> expression() #Equal(2)
-    | <NOTEQ> expression() #NotEqual(2)
-    | <LT> expression() #LessThan(2)
-    | <LTEQ> expression() #LessThanEqual(2)
-    | <GT> expression() #GreaterThan(2)
-    | <GTEQ> expression() #GreaterThanEqual(2)
-    |<OR> condition() #Or(2) |
-          <AND> condition() #And(2) | {}
+    <EQ> condition() #Equal(2)
+    | <NOTEQ> condition() #NotEqual(2)
+    | <LT> condition() #LessThan(2)
+    | <LTEQ> condition() #LessThanEqual(2)
+    | <GT> condition() #GreaterThan(2)
+    | <GTEQ> condition() #GreaterThanEqual(2)
+    |<OR> condition() #Or(2)
+    | <AND> condition() #And(2)
+    | {}
 }
 
 void boolOp ( ) #Boolean: { Token t; }
