@@ -6,7 +6,7 @@ integer test_fn (x:integer,y:integer) is
 begin
   i = 2;
   i = 2 + x;
-  return (x);
+  return (y);
 end
 
 main

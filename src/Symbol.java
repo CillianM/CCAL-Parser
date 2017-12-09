@@ -113,4 +113,26 @@ class Symbol {
         stringBuilder.append("}");
         return stringBuilder.toString();
     }
+
+    String getSymbolString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Name: ").append(getName()).append("\n");
+        stringBuilder.append("\t ").append("SymbolType: ").append(getSymbolType()).append("\n");
+        if(getSymbolType().equals(SymbolType.FUNC)){
+            stringBuilder.append("\t ").append("Parameters: ").append(printValues()).append("\n");
+            stringBuilder.append("\t ").append("Is called?: ").append(getIsCalled()).append("\n");
+        }
+        else {
+            if (getValues().size() > 0) {
+                stringBuilder.append("\t ").append(" Values: ").append(printValues()).append("\n");
+            } else {
+                stringBuilder.append("\t ").append(" Values: No assignments made").append("\n");
+            }
+            stringBuilder.append("\t ").append("Is written to: ").append(getValues().size() > 0).append("\n");
+            stringBuilder.append("\t ").append("Is read from: ").append(getIsRead()).append("\n");
+        }
+
+        return stringBuilder.toString();
+
+    }
 }

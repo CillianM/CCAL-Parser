@@ -246,10 +246,6 @@ public class Representer implements CCALParserVisitor {
         ThreeAddressCode gotoIf = new ThreeAddressCode();
         gotoIf.setAddress1("goto");
         gotoIf.setAddress2(jumpLables.get(node.jjtGetChild(1).jjtGetChild(0).hashCode() + ""));
-        ThreeAddressCode gotoEnd = new ThreeAddressCode();
-        gotoEnd.setAddress1("goto");
-        gotoEnd.setAddress2(jumpToLable);
-
 
         ThreeAddressCode endIf = new ThreeAddressCode();
         endIf.setAddress1(jumpToLable);
@@ -259,8 +255,6 @@ public class Representer implements CCALParserVisitor {
         gotoStart.setAddress2(startWhile);
 
         currentAddressCodes.add(gotoIf);
-        currentAddressCodes.add(gotoEnd);
-        currentAddressCodes.add(endIf);
         addressCodes.put(currentLable, currentAddressCodes);
 
         currentAddressCodes = addressCodes.get(ifJumpLable);
@@ -500,8 +494,18 @@ public class Representer implements CCALParserVisitor {
 
         ThreeAddressCode andAddressCode = new ThreeAddressCode();
         andAddressCode.setAddress1("&&");
-        andAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
-        andAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        if(node.jjtGetChild(0) instanceof ASTDigit || node.jjtGetChild(0) instanceof ASTBoolean || node.jjtGetChild(0) instanceof ASTVariable) {
+            andAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
+        }
+        else{
+            node.childrenAccept(this, data);
+        }
+        if(node.jjtGetChild(1) instanceof ASTDigit || node.jjtGetChild(1) instanceof ASTBoolean || node.jjtGetChild(1) instanceof ASTVariable) {
+            andAddressCode.setAddress3(node.jjtGetChild(1).jjtAccept(this, null).toString());
+        }
+        else {
+            node.childrenAccept(this, data);
+        }
 
         currentAddressCodes.add(andAddressCode);
         addressCodes.put(currentLable, currentAddressCodes);
@@ -571,7 +575,10 @@ public class Representer implements CCALParserVisitor {
         asignAddressCode.setAddress1("=");
         asignAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
 
-        if(!(node.jjtGetChild(1) instanceof ASTVariable) && !(node.jjtGetChild(1) instanceof ASTDigit) && !(node.jjtGetChild(1) instanceof ASTBoolean)){
+        if(node.jjtGetChild(1) instanceof ASTMinus){
+            asignAddressCode.setAddress3("-" +  node.jjtGetChild(1).jjtGetChild(0).jjtAccept(this, null).toString());
+        }
+        else if(!(node.jjtGetChild(1) instanceof ASTVariable) && !(node.jjtGetChild(1) instanceof ASTDigit) && !(node.jjtGetChild(1) instanceof ASTBoolean)){
             node.childrenAccept(this, data);
             currentAddressCodes = addressCodes.get(currentLable);
         }

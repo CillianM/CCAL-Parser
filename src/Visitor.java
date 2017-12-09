@@ -42,24 +42,16 @@ public class Visitor implements CCALParserVisitor {
             for (Object symbol : symbols) {
                 String symbolName = (String) symbol;
                 Symbol currentSymbol = symbolTable.get(scopeName).get(symbolName);
-                System.out.println(symbolName);
-                System.out.println(" SymbolType: " + currentSymbol.getSymbolType());
-                System.out.println(" Type: " + currentSymbol.getType());
+                System.out.println(currentSymbol.getSymbolString());
                 if (currentSymbol.getSymbolType() == SymbolType.FUNC) { //so we know what variables of the symbol to access
-                    System.out.println(" Parameters: " + currentSymbol.printValues());
-                    System.out.println(" Is called?: " + currentSymbol.getIsCalled());
                     if (!currentSymbol.getIsCalled()) {
                         functionsNotCalled++; //update counter if it has not been called
                     }
                 } else {
-                    if (currentSymbol.getValues().size() > 0) {
-                        System.out.println(" Values: " + currentSymbol.printValues()); //print out all assignments of this variable
-                    } else {
-                        System.out.println(" Values: No assignments made"); //VAR has not been written to, update counter
-                        variablesNotWritten.add(currentSymbol.getName().image);
+                    if (currentSymbol.getValues().size() == 0 && !currentSymbol.getSymbolType().equals(SymbolType.PARAM)) {
+                        //a param doesn't matter here as we assume it's assigned from the variable that's passed in
+                        variablesNotWritten.add(currentSymbol.getName().image); //print out all assignments of this variable
                     }
-                    System.out.println(" Is written to?: " + (currentSymbol.getValues().size() > 0));
-                    System.out.println(" Is read from?: " + currentSymbol.getIsRead());
                     if (!currentSymbol.getIsRead()) {
                         variablesNotRead.add(currentSymbol.getName().image);
                     }
@@ -160,10 +152,9 @@ public class Visitor implements CCALParserVisitor {
                     currentSymbolTable = symbolTable.get(PROGRAMME);
                     returnedSymbol = currentSymbolTable.get(returnedToken.image);
                 }
-                if (returnedSymbol.getValues().size() == 0) { //check if there are any values assigned to value
-                    if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) { //If we're in anything but the function (as the value in the function came from a param)
-                        errorList.add(new ErrorMessage(returnedToken.beginLine, returnedToken.beginColumn, "Variable \"" + returnedToken.image + "\" has no value in currentScope \"" + currentScope + "\""));
-                    }
+                if (returnedSymbol.getValues().size() == 0 && !returnedSymbol.getSymbolType().equals(SymbolType.PARAM)) { //Make sure the value we're returning has a value
+                    //as the value would have come from a param if it's a function
+                    errorList.add(new ErrorMessage(returnedToken.beginLine, returnedToken.beginColumn, "Variable \"" + returnedToken.image + "\" has no value in currentScope \"" + currentScope + "\""));
                 }
                 returnedSymbol.setIsRead(true);
                 updateSymbol(returnedToken.image, returnedSymbol);
@@ -348,11 +339,8 @@ public class Visitor implements CCALParserVisitor {
         }
         if (variableSymbol == null) {
             errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Variable \"" + variableName.image + "\" not declared in any scope"));
-        } else if (variableSymbol.getValues().size() == 0) {
-            if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
-                // error if var has no value
+        } else if (variableSymbol.getValues().size() == 0 && !variableSymbol.getSymbolType().equals(SymbolType.PARAM)) {
                 errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Variable \"" + variableName.image + "\" has no value in currentScope \"" + currentScope + "\""));
-            }
         } else if (!variableSymbol.getType().image.equals(INTEGER)) {
             errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Cannot create negative value from " + variableSymbol.getSymbolType() + " \"" + variableName.image + "\". Not of type integer"));
         } else {
@@ -420,10 +408,8 @@ public class Visitor implements CCALParserVisitor {
         }
         if (argumentSymbol == null) {
             errorList.add(new ErrorMessage(argumentName.beginLine, argumentName.beginColumn, "VAR or Const \"" + argumentName.image + "\" has not been declared in currentScope \"" + currentScope + "\""));
-        } else if (argumentSymbol.getValues().size() == 0) {
-            if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
+        } else if (argumentSymbol.getValues().size() == 0 && !argumentSymbol.getSymbolType().equals(SymbolType.PARAM)) {
                 errorList.add(new ErrorMessage(argumentName.beginLine, argumentName.beginColumn, "VAR \"" + argumentName.image + "\" has been declared in currentScope \"" + currentScope + "\", but has no value"));
-            }
         } else {
             argumentSymbol.setIsRead(true);
             updateSymbol(argumentName.image, argumentSymbol);
@@ -673,12 +659,9 @@ public class Visitor implements CCALParserVisitor {
             if (symbol == null) {
                 errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "VAR or Const \"" + token.image + "\" not declared in  any scope \""));
                 return false;
-            } else if (symbol.getValues().size() == 0) {
-                if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
-                    // error if var has no value
+            } else if (symbol.getValues().size() == 0 && !symbol.getSymbolType().equals(SymbolType.PARAM)) {
                     errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "VAR \"" + token.image + "\" has no value in scope \"" + currentScope + "\""));
                     return false;
-                }
             } else if (!symbol.getType().image.equals(BOOLEAN)) {
                 errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, symbol.getSymbolType() + " \"" + token.image + "\" is not of type boolean"));
                 return false;
@@ -711,11 +694,8 @@ public class Visitor implements CCALParserVisitor {
                 leftSymbol.setIsRead(true);
                 updateSymbol(leftToken.image, leftSymbol);
 
-                if (leftSymbol.getValues().size() == 0) {
-                    if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
-                        // error if var has no value
+                if (leftSymbol.getValues().size() == 0 && !leftSymbol.getSymbolType().equals(SymbolType.PARAM)) {
                         errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, leftToken.image + "\" has no value in scope \"" + currentScope + "\""));
-                    }
                 }
             }
         } else if (leftNode instanceof ASTDigit) {
@@ -735,11 +715,8 @@ public class Visitor implements CCALParserVisitor {
             if (rightSymbol == null) {
                 // error if var or const has not been declared before
                 errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "VAR or CONST \"" + rightToken.image + "\" not declared in any scope \""));
-            } else if (rightSymbol.getValues().size() == 0) {
-                if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
-                    // error if var has no value
+            } else if (rightSymbol.getValues().size() == 0 && !rightSymbol.getSymbolType().equals(SymbolType.PARAM)) {
                     errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "VAR \"" + rightToken.image + "\" has no value in current scope \"" + currentScope + "\""));
-                }
                 rightSymbol.setIsRead(true);
                 updateSymbol(leftToken.image, rightSymbol);
             } else if (!rightSymbol.getType().image.equals(leftSymbolType)) {
@@ -826,31 +803,25 @@ public class Visitor implements CCALParserVisitor {
     //Will throw appropriate errors and return back if it's something to recurse into
     private boolean isValidArithmetic(Node node, Token token) {
         if (node instanceof ASTVariable) {
-            String foundIn1 = currentScope;
-
             HashMap<String, Symbol> currentScopeSymbolTable = symbolTable.get(currentScope);
             Symbol currentSymbol = currentScopeSymbolTable.get(token.image);
             if (currentSymbol == null) {
                 currentScopeSymbolTable = symbolTable.get(PROGRAMME);
-                foundIn1 = PROGRAMME;
                 currentSymbol = currentScopeSymbolTable.get(token.image);
             }
             if (currentSymbol == null) {
                 errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "VAR or Const \"" + token.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Programme\""));
                 return false;
-            } else if (currentSymbol.getValues().size() == 0) {
-                if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
+            } else if (currentSymbol.getValues().size() == 0 && !currentSymbol.getSymbolType().equals(SymbolType.PARAM)) {
                     errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "VAR \"" + token.image + "\" has no value in currentScope \"" + currentScope + "\""));
                     return false;
-                }
             } else if (!currentSymbol.getType().image.equals(INTEGER)) {
                 errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Cannot add variable \"" + token.image + "\". Not of type Digit"));
                 return false;
             } else {
                 // set isRead value
                 currentSymbol.setIsRead(true);
-                currentScopeSymbolTable.put(token.image, currentSymbol);
-                symbolTable.put(foundIn1, currentScopeSymbolTable);
+                updateSymbol(token.image,currentSymbol);
             }
         } else if (node instanceof ASTDigit) {
             return false;
