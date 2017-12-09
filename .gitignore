@@ -6,7 +6,7 @@
 !BaseNode.java
 !Visitor.java
 !Symbol.java
-!DataType.java
+!SymbolType.java
 !Representer.java
 !Variable.java
 !ThreeAddressCode.java

@@ -1,12 +1,6 @@
-integer addTwo (i:integer) is
-var x:integer;
-begin
-  i = i + 2;
-  return (i);
-end
-
 main
 begin
-  const x : integer = 5;
-  x = addTwo (x);
+  var x:integer;
+  x = 2;
+  x = 3;
 end

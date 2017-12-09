@@ -6,6 +6,8 @@ public class Visitor implements CCALParserVisitor {
     //Keep track of the scope we're in along with what the above scope was --> for nesting
     private static final String PROGRAMME = "Programme";
     private static final String MAIN = "Main";
+    private static final String INTEGER = "integer";
+    private static final String BOOLEAN = "boolean";
     private String currentScope = PROGRAMME;
     private String previousScope;
     //Is every variable both written to and read from?
@@ -41,9 +43,9 @@ public class Visitor implements CCALParserVisitor {
                 String symbolName = (String) symbol;
                 Symbol currentSymbol = symbolTable.get(scopeName).get(symbolName);
                 System.out.println(symbolName);
-                System.out.println(" DataType: " + currentSymbol.getDataType());
+                System.out.println(" SymbolType: " + currentSymbol.getSymbolType());
                 System.out.println(" Type: " + currentSymbol.getType());
-                if (currentSymbol.getDataType() == DataType.Function) { //so we know what variables of the symbol to access
+                if (currentSymbol.getSymbolType() == SymbolType.FUNC) { //so we know what variables of the symbol to access
                     System.out.println(" Parameters: " + currentSymbol.printValues());
                     System.out.println(" Is called?: " + currentSymbol.getIsCalled());
                     if (!currentSymbol.getIsCalled()) {
@@ -53,7 +55,7 @@ public class Visitor implements CCALParserVisitor {
                     if (currentSymbol.getValues().size() > 0) {
                         System.out.println(" Values: " + currentSymbol.printValues()); //print out all assignments of this variable
                     } else {
-                        System.out.println(" Values: No assignments made"); //Variable has not been written to, update counter
+                        System.out.println(" Values: No assignments made"); //VAR has not been written to, update counter
                         variablesNotWritten.add(currentSymbol.getName().image);
                     }
                     System.out.println(" Is written to?: " + (currentSymbol.getValues().size() > 0));
@@ -112,7 +114,7 @@ public class Visitor implements CCALParserVisitor {
         symbol.setName(functionName);
         symbol.setType(functionType);
         symbol.setScope(currentScope);
-        symbol.setDataType(DataType.Function);
+        symbol.setSymbolType(SymbolType.FUNC);
         symbol.setNumArgs(node.jjtGetChild(2).jjtGetNumChildren()); //get the number of arguments through it's children
 
         //Check if the function already exists
@@ -190,7 +192,7 @@ public class Visitor implements CCALParserVisitor {
         symbol.setName(paramName);
         symbol.setType(paramType);
         symbol.setScope(currentScope);
-        symbol.setDataType(DataType.ParamVariable);
+        symbol.setSymbolType(SymbolType.PARAM);
         currentSymbolTable.put(paramName.image, symbol);
         symbolTable.put(currentScope, currentSymbolTable);
 
@@ -266,11 +268,11 @@ public class Visitor implements CCALParserVisitor {
             symbol.setName(contantName);
             symbol.setType(constantType);
             symbol.setScope(currentScope);
-            symbol.setDataType(DataType.Constant);
+            symbol.setSymbolType(SymbolType.CONST);
             symbolTable.put(currentScope, currentScopeSymbolTable);
             currentScopeSymbolTable.put(contantName.image, symbol);
 
-            if ((constantType.image.equals("integer") && !isInt(contantValue.image)) || (constantType.image.equals("boolean") && !isBoolean(contantValue.image))) {
+            if ((constantType.image.equals(INTEGER) && !isInt(contantValue.image)) || (constantType.image.equals(BOOLEAN) && !isBoolean(contantValue.image))) {
                 errorList.add(new ErrorMessage(contantName.beginLine, contantName.beginColumn, "Invalid type assigned to constant \"" + contantName.image + "\""));
             } else {
                 Variable variable = new Variable(symbol.getType().toString(), contantValue.image.toLowerCase());
@@ -278,7 +280,7 @@ public class Visitor implements CCALParserVisitor {
             }
             currentScopeSymbolTable.put(contantName.image, symbol);
         } else {
-            errorList.add(new ErrorMessage(contantName.beginLine, contantName.beginColumn, "Constant \"" + contantName.image + "\" already declared in currentScope \"" + currentScope + "\""));
+            errorList.add(new ErrorMessage(contantName.beginLine, contantName.beginColumn, "CONST \"" + contantName.image + "\" already declared in currentScope \"" + currentScope + "\""));
         }
         symbolTable.put(currentScope, currentScopeSymbolTable); //update the symbol table with the updates made to the current scope
         return null;
@@ -299,10 +301,10 @@ public class Visitor implements CCALParserVisitor {
             symbol.setName(varName);
             symbol.setType(varType);
             symbol.setScope(currentScope);
-            symbol.setDataType(DataType.Variable);
+            symbol.setSymbolType(SymbolType.VAR);
             currentScopeSymbolTable.put(varName.image, symbol);
         } else {
-            errorList.add(new ErrorMessage(varName.beginLine, varName.beginColumn, "Variable \"" + varName.image + "\" already declared in currentScope \"" + currentScope + "\""));
+            errorList.add(new ErrorMessage(varName.beginLine, varName.beginColumn, "VAR \"" + varName.image + "\" already declared in currentScope \"" + currentScope + "\""));
         }
         symbolTable.put(currentScope, currentScopeSymbolTable);
 
@@ -330,7 +332,7 @@ public class Visitor implements CCALParserVisitor {
             functionSymbol.setIsCalled(true);
             updateSymbol(functionName.image, functionSymbol);
         } else {
-            errorList.add(new ErrorMessage(functionName.beginLine, functionName.beginColumn, "Function \"" + functionName.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Programme\""));
+            errorList.add(new ErrorMessage(functionName.beginLine, functionName.beginColumn, "Function \"" + functionName.image + "\" not declared in any scope"));
         }
         return null;
     }
@@ -345,15 +347,14 @@ public class Visitor implements CCALParserVisitor {
             variableSymbol = currentSymbolTable.get(variableName.image);
         }
         if (variableSymbol == null) {
-            // If we're still not finding it then there is a problem
             errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Variable \"" + variableName.image + "\" not declared in any scope"));
         } else if (variableSymbol.getValues().size() == 0) {
             if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
                 // error if var has no value
                 errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Variable \"" + variableName.image + "\" has no value in currentScope \"" + currentScope + "\""));
             }
-        } else if (!variableSymbol.getType().image.equals("integer")) {
-            errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Cannot create negative value from " + variableSymbol.getDataType() + " \"" + variableName.image + "\". Not of type integer"));
+        } else if (!variableSymbol.getType().image.equals(INTEGER)) {
+            errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Cannot create negative value from " + variableSymbol.getSymbolType() + " \"" + variableName.image + "\". Not of type integer"));
         } else {
             Variable variable = new Variable(variableSymbol.getType().toString(), "-" + variableName); //Assign the minus sign the the value here
             variableSymbol.addValue(variableName.image, variable);
@@ -373,13 +374,13 @@ public class Visitor implements CCALParserVisitor {
             Symbol functionSymbol = mapTemp.get(functionName.image);
             if (functionSymbol == null) {
                 // error, no such function
-                errorList.add(new ErrorMessage(functionName.beginLine, functionName.beginColumn, "No such function called \"" + functionName.image + "\""));
+                errorList.add(new ErrorMessage(functionName.beginLine, functionName.beginColumn, "No function called \"" + functionName.image + "\""));
             } else {
                 // check for correct number of Args
                 int numArgsDeclared = functionSymbol.getNumArgs();
                 int numArgsPassed = node.jjtGetNumChildren();
                 if (numArgsDeclared != numArgsPassed) {
-                    errorList.add(new ErrorMessage(functionName.beginLine, functionName.beginColumn, "Function \"" + functionName.image + "\" has invalid number of arguments. called with " + numArgsPassed + " argument(s), should have " + numArgsDeclared));
+                    errorList.add(new ErrorMessage(functionName.beginLine, functionName.beginColumn, "Function \"" + functionName.image + "\" has invalid number of arguments. Should have " + numArgsDeclared + " but called with " + numArgsPassed + " argument(s)"));
                 } else if (numArgsDeclared > 0) {
                     //Loop through the functions arguments and evaluate them
                     Object[] keys =  functionSymbol.getValues().keySet().toArray();
@@ -393,10 +394,10 @@ public class Visitor implements CCALParserVisitor {
                             argumentSymbol = mapTemp.get(argumentName.image);
                         }
                         if (!argumentSymbol.getType().image.equals(type)) {
-                            errorList.add(new ErrorMessage(argumentName.beginLine, argumentName.beginColumn, "\"" + argumentName.image + "\" in function call for \"" + functionName.image + "\" is the wrong type"));
+                            errorList.add(new ErrorMessage(argumentName.beginLine, argumentName.beginColumn, "\"" + argumentName.image + "\" is of the wrong type for function \"" + functionName.image + "\""));
                         }
                         //if argument is variable then it is accessed
-                        if (argumentSymbol.getDataType() != DataType.Unknown) {
+                        if (argumentSymbol.getSymbolType() != SymbolType.NAS) {
                             argumentSymbol.setIsRead(true);
                             updateSymbol(argumentName.image, argumentSymbol);
                         }
@@ -418,10 +419,10 @@ public class Visitor implements CCALParserVisitor {
             argumentSymbol = currentSymbolTable.get(argumentName.image);
         }
         if (argumentSymbol == null) {
-            errorList.add(new ErrorMessage(argumentName.beginLine, argumentName.beginColumn, "Variable or Const \"" + argumentName.image + "\" has not been declared in currentScope \"" + currentScope + "\""));
+            errorList.add(new ErrorMessage(argumentName.beginLine, argumentName.beginColumn, "VAR or Const \"" + argumentName.image + "\" has not been declared in currentScope \"" + currentScope + "\""));
         } else if (argumentSymbol.getValues().size() == 0) {
             if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
-                errorList.add(new ErrorMessage(argumentName.beginLine, argumentName.beginColumn, "Variable \"" + argumentName.image + "\" has been declared in currentScope \"" + currentScope + "\", but has no value"));
+                errorList.add(new ErrorMessage(argumentName.beginLine, argumentName.beginColumn, "VAR \"" + argumentName.image + "\" has been declared in currentScope \"" + currentScope + "\", but has no value"));
             }
         } else {
             argumentSymbol.setIsRead(true);
@@ -525,40 +526,38 @@ public class Visitor implements CCALParserVisitor {
         if (variableSymbol != null) { //If it's in the main programmes scope after the last check we're ok
             Token assignedValue = (Token) node.jjtGetChild(1).jjtAccept(this, null);
             Node assignedNode = node.jjtGetChild(1);
+            if(variableSymbol.getSymbolType().equals(SymbolType.CONST)){ //constants can't be reassigned
+                errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn,  " \"" + variableName + "\" cannot be reassigned a value as it is of type \"" + variableSymbol.getSymbolType() + "\""));
+            }
             if (assignedNode instanceof ASTVariable) {
                 Symbol assignedSymbol = symbolTable.get(currentScope).get(assignedValue.image);
                 if (assignedSymbol == null) {
                     assignedSymbol = symbolTable.get(PROGRAMME).get(assignedValue.image);
                 }
                 if (assignedSymbol == null) {
-                    errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, variableSymbol.getDataType() + " \"" + assignedValue.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Programme\""));
+                    errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, variableSymbol.getSymbolType() + " \"" + assignedValue.image + "\" not declared in any scope \""));
                 } else if (!variableSymbol.getType().image.equals(assignedSymbol.getType().image)) {
                     errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "\"" + variableName.image + "\" and \"" + assignedValue.image + "\" are not of same type"));
-                } else if (variableSymbol.getValues().size() == 0) {
-                    variableSymbol.setIsRead(true);
+                }
+                else  {
                     Variable variable = new Variable(variableSymbol.getType().toString(), assignedValue.toString());
                     variableSymbol.addValue(variableName.image, variable);
                     currentScopeSymbolTable.put(variableName.image, variableSymbol);
                     symbolTable.put(currentScope, currentScopeSymbolTable);
                     assignedSymbol.setIsRead(true);
                     updateSymbol(assignedValue.image, assignedSymbol);
-                } else {
-                    assignedSymbol.setIsRead(true);
-                    assignedSymbol.setIsCalled(true);
-                    updateSymbol(assignedValue.image, assignedSymbol);
                 }
             } else if (assignedNode instanceof ASTDigit) {
-                if (!variableSymbol.getType().image.equals("integer")) {
+                if (!variableSymbol.getType().image.equals(INTEGER)) {
                     errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Cannot assign type Digit to \"" + variableName.image + "\""));
-                } else if (variableSymbol.getValues().size() == 0) {
+                } else {
                     // if its initial value has already been stored, leave it
                     Variable variable = new Variable(variableSymbol.getType().toString(), assignedValue.toString());
                     variableSymbol.addValue(variableName.image, variable);
-                    variableSymbol.setIsCalled(true);
                     updateSymbol(variableName.image, variableSymbol);
                 }
             } else if (assignedNode instanceof ASTBoolean) {
-                if (!variableSymbol.getType().image.equals("boolean")) {
+                if (!variableSymbol.getType().image.equals(BOOLEAN)) {
                     errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Cannot assign type boolean to \"" + variableName.image + "\""));
                 }
                 // if its initial value has already been stored, leave it
@@ -581,16 +580,6 @@ public class Visitor implements CCALParserVisitor {
             errorList.add(new ErrorMessage(variableName.beginLine, variableName.beginColumn, "Variable \"" + variableName.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Programme\""));
         }
         return null;
-    }
-
-    private void setAsReadAndCalled(Token token) {
-        Symbol rightSymbol = symbolTable.get(currentScope).get(token.image);
-        if (rightSymbol == null) {
-            rightSymbol = symbolTable.get(PROGRAMME).get(token.image);
-        }
-        rightSymbol.setIsRead(true);
-        rightSymbol.setIsCalled(true);
-        updateSymbol(token.image, rightSymbol);
     }
 
     //Place the symbol into the correct scope
@@ -682,16 +671,16 @@ public class Visitor implements CCALParserVisitor {
                 symbol = symbolTable.get(PROGRAMME).get(token.image);
             }
             if (symbol == null) {
-                errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Variable or Const \"" + token.image + "\" not declared in  any scope \""));
+                errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "VAR or Const \"" + token.image + "\" not declared in  any scope \""));
                 return false;
             } else if (symbol.getValues().size() == 0) {
                 if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
                     // error if var has no value
-                    errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Variable \"" + token.image + "\" has no value in scope \"" + currentScope + "\""));
+                    errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "VAR \"" + token.image + "\" has no value in scope \"" + currentScope + "\""));
                     return false;
                 }
-            } else if (!symbol.getType().image.equals("boolean")) {
-                errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, symbol.getDataType() + " \"" + token.image + "\" is not of type boolean"));
+            } else if (!symbol.getType().image.equals(BOOLEAN)) {
+                errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, symbol.getSymbolType() + " \"" + token.image + "\" is not of type boolean"));
                 return false;
             }
         } else if (node instanceof ASTDigit) {
@@ -716,7 +705,7 @@ public class Visitor implements CCALParserVisitor {
             }
             if (leftSymbol == null) {
                 // error if var or const has not been declared before
-                errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "Variable or Const \"" + leftToken.image + "\" not declared in any scope \""));
+                errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, leftToken.image + "\" not declared in any scope \""));
             } else {
                 leftSymbolType = leftSymbol.getType().image;
                 leftSymbol.setIsRead(true);
@@ -725,14 +714,14 @@ public class Visitor implements CCALParserVisitor {
                 if (leftSymbol.getValues().size() == 0) {
                     if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
                         // error if var has no value
-                        errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "Variable \"" + leftToken.image + "\" has no value in scope \"" + currentScope + "\""));
+                        errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, leftToken.image + "\" has no value in scope \"" + currentScope + "\""));
                     }
                 }
             }
         } else if (leftNode instanceof ASTDigit) {
-            leftSymbolType = "integer";
+            leftSymbolType = INTEGER;
         } else if (leftNode instanceof ASTBoolean) {
-            leftSymbolType = "boolean";
+            leftSymbolType = BOOLEAN;
         }
 
         Node rightNode = parentNode.jjtGetChild(1);
@@ -745,20 +734,20 @@ public class Visitor implements CCALParserVisitor {
             }
             if (rightSymbol == null) {
                 // error if var or const has not been declared before
-                errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "Variable or Constant \"" + rightToken.image + "\" not declared in any scope \""));
+                errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "VAR or CONST \"" + rightToken.image + "\" not declared in any scope \""));
             } else if (rightSymbol.getValues().size() == 0) {
                 if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
                     // error if var has no value
-                    errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "Variable \"" + rightToken.image + "\" has no value in current scope \"" + currentScope + "\""));
+                    errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "VAR \"" + rightToken.image + "\" has no value in current scope \"" + currentScope + "\""));
                 }
                 rightSymbol.setIsRead(true);
                 updateSymbol(leftToken.image, rightSymbol);
             } else if (!rightSymbol.getType().image.equals(leftSymbolType)) {
                 // error if is not a boolean
-                errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, rightSymbol.getDataType() + " \"" + rightToken.image + "\" is not of type " + leftSymbolType));
+                errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, rightSymbol.getSymbolType() + " \"" + rightToken.image + "\" is not of type " + leftSymbolType));
             }
 
-        } else if ((rightNode instanceof ASTDigit && !leftSymbolType.equals("integer")) || (rightNode instanceof ASTBoolean && !leftSymbolType.equals("boolean"))) {
+        } else if ((rightNode instanceof ASTDigit && !leftSymbolType.equals(INTEGER)) || (rightNode instanceof ASTBoolean && !leftSymbolType.equals(BOOLEAN))) {
             // error if number
             errorList.add(new ErrorMessage(leftToken.beginLine, leftToken.beginColumn, "Invalid boolean using \"" + rightToken.image));
         }
@@ -809,7 +798,7 @@ public class Visitor implements CCALParserVisitor {
         if (isValidArithmetic(rightNode, rightToken)) {
             evaluateArithmaticChildren(parentNode, data);
         }
-        String type = "integer";
+        String type = INTEGER;
         String leftValue = leftToken.image;
         String rightValue = rightToken.image;
         if(data != null){
@@ -847,14 +836,14 @@ public class Visitor implements CCALParserVisitor {
                 currentSymbol = currentScopeSymbolTable.get(token.image);
             }
             if (currentSymbol == null) {
-                errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Variable or Const \"" + token.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Programme\""));
+                errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "VAR or Const \"" + token.image + "\" not declared in currentScope \"" + currentScope + "\" or \"Programme\""));
                 return false;
             } else if (currentSymbol.getValues().size() == 0) {
                 if (currentScope.equals(PROGRAMME) || currentScope.equals(MAIN)) {
-                    errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Variable \"" + token.image + "\" has no value in currentScope \"" + currentScope + "\""));
+                    errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "VAR \"" + token.image + "\" has no value in currentScope \"" + currentScope + "\""));
                     return false;
                 }
-            } else if (!currentSymbol.getType().image.equals("integer")) {
+            } else if (!currentSymbol.getType().image.equals(INTEGER)) {
                 errorList.add(new ErrorMessage(token.beginLine, token.beginColumn, "Cannot add variable \"" + token.image + "\". Not of type Digit"));
                 return false;
             } else {

@@ -5,7 +5,7 @@ import java.util.Map;
 class Symbol {
     private Token name;
     private Token type;
-    private DataType dataType;
+    private SymbolType symbolType;
     private String scope;
     private LinkedHashMap<String, LinkedList<Variable>> values;
     private int numArgs = -1;
@@ -33,12 +33,12 @@ class Symbol {
         return type;
     }
 
-    void setDataType(DataType d0) {
-        dataType = d0;
+    void setSymbolType(SymbolType d0) {
+        symbolType = d0;
     }
 
-    DataType getDataType() {
-        return dataType;
+    SymbolType getSymbolType() {
+        return symbolType;
     }
 
     void setScope(String s0) {
@@ -113,13 +113,4 @@ class Symbol {
         stringBuilder.append("}");
         return stringBuilder.toString();
     }
-
-    @Override
-    public String toString() {
-        return "[" + name + ", " + type + ", " + dataType + ", " + scope
-                + ", " + values + ", " + numArgs + ", " + isRead + "]";
-    }
-
-
-
 }

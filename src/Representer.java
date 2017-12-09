@@ -47,6 +47,14 @@ public class Representer implements CCALParserVisitor {
         node.childrenAccept(this, data);
 
         currentLable = previousLable;
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
+        }
+        ThreeAddressCode endMain = new ThreeAddressCode();
+        endMain.setAddress1("END");
+        currentAddressCodes.add(endMain);
+        addressCodes.put(currentLable,currentAddressCodes);
         labelCount++;
 
         return null;
@@ -135,7 +143,15 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTStatementBlock node, Object data) {
+        if(data instanceof ASTIf || data instanceof ASTWhile){
+            currentLable = "L" + (labelCount + 1);
+            labelCount++;
+        }
         node.childrenAccept(this, data);
+        if(data instanceof ASTIf || data instanceof ASTWhile){
+            String hash = node.jjtGetChild(0).hashCode() + "";
+            jumpLables.put(hash,currentLable);
+        }
         return null;
     }
 
@@ -147,13 +163,116 @@ public class Representer implements CCALParserVisitor {
 
     @Override
     public Object visit(ASTIf node, Object data) {
-        node.childrenAccept(this, data);
+        previousLable = currentLable;
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
+        }
+
+        ThreeAddressCode returnAddressCode = new ThreeAddressCode();
+        returnAddressCode.setAddress1("if");
+        currentAddressCodes.add(returnAddressCode);
+        labelCount++;
+        node.childrenAccept(this, node);
+
+        currentLable = previousLable;
+        String ifJumpLable = "L" + (labelCount - 1);
+        String elseJumpLable = "L" + (labelCount);
+        labelCount++;
+        String jumpToLable = "L" + (labelCount);
+        addressCodes.put(currentLable, currentAddressCodes);
+        ThreeAddressCode gotoIf = new ThreeAddressCode();
+        gotoIf.setAddress1("goto");
+        gotoIf.setAddress2(jumpLables.get(node.jjtGetChild(1).jjtGetChild(0).hashCode() + ""));
+        ThreeAddressCode gotoElse = new ThreeAddressCode();
+        gotoElse.setAddress1("goto");
+        gotoElse.setAddress2(jumpLables.get(node.jjtGetChild(2).jjtGetChild(0).hashCode() + ""));
+
+
+        ThreeAddressCode endIf = new ThreeAddressCode();
+        endIf.setAddress1(jumpToLable);
+
+        ThreeAddressCode gotoEnd = new ThreeAddressCode();
+        gotoEnd.setAddress1("goto");
+        gotoEnd.setAddress2(jumpToLable);
+
+        currentAddressCodes.add(gotoIf);
+        currentAddressCodes.add(gotoElse);
+        currentAddressCodes.add(endIf);
+        addressCodes.put(currentLable, currentAddressCodes);
+
+        currentAddressCodes = addressCodes.get(ifJumpLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
+        }
+        currentAddressCodes.add(gotoEnd);
+        addressCodes.put(ifJumpLable, currentAddressCodes);
+        currentAddressCodes = addressCodes.get(elseJumpLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
+        }
+        currentAddressCodes.add(gotoEnd);
+        addressCodes.put(elseJumpLable, currentAddressCodes);
+
+        currentLable = previousLable;
+        labelCount++;
+
         return null;
     }
 
     @Override
     public Object visit(ASTWhile node, Object data) {
-        node.childrenAccept(this, data);
+        previousLable = currentLable;
+        ArrayList<ThreeAddressCode> currentAddressCodes = addressCodes.get(currentLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
+        }
+        labelCount++;
+        String startWhile = "L" + (labelCount + 1);
+        ThreeAddressCode startWhileAddressCode = new ThreeAddressCode();
+        startWhileAddressCode.setAddress1(startWhile);
+        ThreeAddressCode returnAddressCode = new ThreeAddressCode();
+        returnAddressCode.setAddress1("while");
+        currentAddressCodes.add(startWhileAddressCode);
+        currentAddressCodes.add(returnAddressCode);
+        labelCount++;
+        node.childrenAccept(this, node);
+
+        currentLable = previousLable;
+        String ifJumpLable = "L" + (labelCount);
+        labelCount++;
+        String jumpToLable = "L" + (labelCount);
+        addressCodes.put(currentLable, currentAddressCodes);
+        ThreeAddressCode gotoIf = new ThreeAddressCode();
+        gotoIf.setAddress1("goto");
+        gotoIf.setAddress2(jumpLables.get(node.jjtGetChild(1).jjtGetChild(0).hashCode() + ""));
+        ThreeAddressCode gotoEnd = new ThreeAddressCode();
+        gotoEnd.setAddress1("goto");
+        gotoEnd.setAddress2(jumpToLable);
+
+
+        ThreeAddressCode endIf = new ThreeAddressCode();
+        endIf.setAddress1(jumpToLable);
+
+        ThreeAddressCode gotoStart = new ThreeAddressCode();
+        gotoStart.setAddress1("goto");
+        gotoStart.setAddress2(startWhile);
+
+        currentAddressCodes.add(gotoIf);
+        currentAddressCodes.add(gotoEnd);
+        currentAddressCodes.add(endIf);
+        addressCodes.put(currentLable, currentAddressCodes);
+
+        currentAddressCodes = addressCodes.get(ifJumpLable);
+        if(currentAddressCodes == null) {
+            currentAddressCodes = new ArrayList<>();
+        }
+        currentAddressCodes.add(gotoStart);
+        addressCodes.put(ifJumpLable, currentAddressCodes);
+
+        currentLable = previousLable;
+        labelCount++;
+
         return null;
     }
 
