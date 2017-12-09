@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 public class Representer implements CCALParserVisitor {
@@ -7,7 +8,7 @@ public class Representer implements CCALParserVisitor {
     private String currentLable = "L0";
     private String previousLable;
     private int labelCount = 0; //Kep track of amount of labels
-    private HashMap<String, ArrayList<ThreeAddressCode>> addressCodes = new HashMap<>();
+    private LinkedHashMap<String, ArrayList<ThreeAddressCode>> addressCodes = new LinkedHashMap<>();
     private HashMap<String, String> jumpLables = new HashMap<>();
 
     @Override
@@ -173,13 +174,14 @@ public class Representer implements CCALParserVisitor {
         returnAddressCode.setAddress1("if");
         currentAddressCodes.add(returnAddressCode);
         labelCount++;
-        String ifLable = currentLable;
+        String currentIfLable = currentLable;
+        int currentLableCount = labelCount;
         node.childrenAccept(this, node);
 
-        currentLable = ifLable;
-        String ifJumpLable = "L" + (labelCount - 1);
-        String elseJumpLable = "L" + (labelCount);
-        String jumpToLable = "L" + (labelCount + 1);
+        currentLable = currentIfLable;
+        String ifJumpLable = "L" + (currentLableCount + 1);
+        String elseJumpLable = "L" + (currentLableCount + 2);
+        String jumpToLable = "L" + (currentLableCount + 3);
         addressCodes.put(currentLable, currentAddressCodes);
         ThreeAddressCode gotoIf = new ThreeAddressCode();
         gotoIf.setAddress1("goto");
@@ -213,9 +215,6 @@ public class Representer implements CCALParserVisitor {
         }
         currentAddressCodes.add(gotoEnd);
         addressCodes.put(elseJumpLable, currentAddressCodes);
-
-        currentLable = previousLable;
-        labelCount++;
 
         return null;
     }
