@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="226487bd-0f83-4444-80f8-483f5308fba1" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/Representer.java" afterPath="$PROJECT_DIR$/src/Representer.java" />
+      <change beforePath="$PROJECT_DIR$/src/Visitor.java" afterPath="$PROJECT_DIR$/src/Visitor.java" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -37,66 +37,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ASTFunctionList.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/ASTFunctionList.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ASTFunction.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/ASTFunction.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ASTFunctionBody.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/ASTFunctionBody.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ASTStatementBlock.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/ASTStatementBlock.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ASTIf.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/ASTIf.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SimpleNode.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/SimpleNode.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="185">
-              <caret line="65" column="0" lean-forward="false" selection-start-line="65" selection-start-column="0" selection-end-line="65" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="test3.ccal" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test3.ccal">
           <provider selected="true" editor-type-id="text-editor">
@@ -107,10 +47,53 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test4.ccal" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Visitor.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Visitor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1147">
+              <caret line="637" column="17" lean-forward="false" selection-start-line="637" selection-start-column="17" selection-end-line="637" selection-end-column="17" />
+              <folding>
+                <element signature="method#visit#2;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#3;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#5;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#7;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#9;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#10;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#11;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#12;class#Visitor#0" expanded="false" />
+                <element signature="e#10271#10272#0" expanded="true" />
+                <element signature="e#10312#10313#0" expanded="true" />
+                <element signature="method#visit#14;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#15;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#16;class#Visitor#0" expanded="false" />
+                <element signature="method#visit#17;class#Visitor#0" expanded="false" />
+                <element signature="e#20853#20854#0" expanded="true" />
+                <element signature="e#20894#20895#0" expanded="true" />
+                <element signature="e#20963#20964#0" expanded="true" />
+                <element signature="e#21004#21005#0" expanded="true" />
+                <element signature="e#21077#21078#0" expanded="true" />
+                <element signature="e#21118#21119#0" expanded="true" />
+                <element signature="e#22344#22345#0" expanded="true" />
+                <element signature="e#22385#22386#0" expanded="true" />
+                <element signature="method#visit#36;class#Visitor#0" expanded="false" />
+                <element signature="method#updateSymbol#0;class#Visitor#0" expanded="false" />
+                <element signature="method#isSematicError#0;class#Visitor#0" expanded="false" />
+                <element signature="method#printErrorList#0;class#Visitor#0" expanded="false" />
+                <element signature="method#isInt#0;class#Visitor#0" expanded="false" />
+                <element signature="e#30257#30258#0" expanded="true" />
+                <element signature="e#30303#30304#0" expanded="true" />
+                <element signature="method#isValidBooleanOperation#0;class#Visitor#0" expanded="false" />
+                <element signature="method#evaluateChildCondition#0;class#Visitor#0" expanded="false" />
+                <element signature="method#evaluateArithmaticChildren#0;class#Visitor#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test4.ccal" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test4.ccal">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-85">
+            <state relative-caret-position="-289">
               <caret line="7" column="22" lean-forward="true" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
               <folding />
             </state>
@@ -138,7 +121,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Pos</find>
       <find>ASTPos</find>
       <find>fun</find>
       <find>functionca</find>
@@ -168,6 +150,7 @@
       <find>astgre</find>
       <find>astwh</find>
       <find>astif</find>
+      <find>asta</find>
     </findStrings>
     <replaceStrings>
       <replace>node2</replace>
@@ -206,10 +189,10 @@
         <option value="$PROJECT_DIR$/test2.ccal" />
         <option value="$PROJECT_DIR$/test3.ccal" />
         <option value="$PROJECT_DIR$/src/ccal_parser.jjt" />
-        <option value="$PROJECT_DIR$/src/Visitor.java" />
         <option value="$PROJECT_DIR$/test4.ccal" />
         <option value="$PROJECT_DIR$/src/Symbol.java" />
         <option value="$PROJECT_DIR$/src/Representer.java" />
+        <option value="$PROJECT_DIR$/src/Visitor.java" />
       </list>
     </option>
   </component>
@@ -407,7 +390,7 @@
       <workItem from="1512592247075" duration="8711000" />
       <workItem from="1512674604507" duration="16640000" />
       <workItem from="1512833401253" duration="66000" />
-      <workItem from="1512833718900" duration="19339000" />
+      <workItem from="1512833718900" duration="20172000" />
     </task>
     <task id="LOCAL-00001" summary="Bracket Fix">
       <created>1509988611472</created>
@@ -507,11 +490,18 @@
       <option name="project" value="LOCAL" />
       <updated>1512853301074</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Ordering lables and fixing if jumps">
+      <created>1512855784354</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1512855784354</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="78801000" />
+    <option name="totallyTimeSpent" value="79634000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -526,7 +516,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.47173914" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26630434" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32934782" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -597,7 +587,8 @@
     <MESSAGE value="Add if/while to 3 address code" />
     <MESSAGE value="Updates" />
     <MESSAGE value="Fixing chained condition&#10;TODO goto's" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing chained condition&#10;TODO goto's" />
+    <MESSAGE value="Ordering lables and fixing if jumps" />
+    <option name="LAST_COMMIT_MESSAGE" value="Ordering lables and fixing if jumps" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -607,12 +598,6 @@
           <line>572</line>
           <properties />
           <option name="timeStamp" value="32" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Visitor.java</url>
-          <line>638</line>
-          <properties />
-          <option name="timeStamp" value="124" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Representer.java</url>
@@ -679,12 +664,14 @@
             <element signature="e#21118#21119#0" expanded="true" />
             <element signature="e#22344#22345#0" expanded="true" />
             <element signature="e#22385#22386#0" expanded="true" />
+            <element signature="method#visit#36;class#Visitor#0" expanded="false" />
             <element signature="method#updateSymbol#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isSematicError#0;class#Visitor#0" expanded="false" />
             <element signature="method#printErrorList#0;class#Visitor#0" expanded="false" />
             <element signature="method#isInt#0;class#Visitor#0" expanded="false" />
             <element signature="e#30257#30258#0" expanded="true" />
             <element signature="e#30303#30304#0" expanded="true" />
-            <element signature="method#isValidBooleanComparison#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isValidBooleanOperation#0;class#Visitor#0" expanded="false" />
             <element signature="method#evaluateChildCondition#0;class#Visitor#0" expanded="false" />
             <element signature="method#evaluateArithmaticChildren#0;class#Visitor#0" expanded="false" />
           </folding>
@@ -726,12 +713,14 @@
             <element signature="e#21118#21119#0" expanded="true" />
             <element signature="e#22344#22345#0" expanded="true" />
             <element signature="e#22385#22386#0" expanded="true" />
+            <element signature="method#visit#36;class#Visitor#0" expanded="false" />
             <element signature="method#updateSymbol#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isSematicError#0;class#Visitor#0" expanded="false" />
             <element signature="method#printErrorList#0;class#Visitor#0" expanded="false" />
             <element signature="method#isInt#0;class#Visitor#0" expanded="false" />
             <element signature="e#30257#30258#0" expanded="true" />
             <element signature="e#30303#30304#0" expanded="true" />
-            <element signature="method#isValidBooleanComparison#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isValidBooleanOperation#0;class#Visitor#0" expanded="false" />
             <element signature="method#evaluateChildCondition#0;class#Visitor#0" expanded="false" />
             <element signature="method#evaluateArithmaticChildren#0;class#Visitor#0" expanded="false" />
           </folding>
@@ -797,12 +786,14 @@
             <element signature="e#21118#21119#0" expanded="true" />
             <element signature="e#22344#22345#0" expanded="true" />
             <element signature="e#22385#22386#0" expanded="true" />
+            <element signature="method#visit#36;class#Visitor#0" expanded="false" />
             <element signature="method#updateSymbol#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isSematicError#0;class#Visitor#0" expanded="false" />
             <element signature="method#printErrorList#0;class#Visitor#0" expanded="false" />
             <element signature="method#isInt#0;class#Visitor#0" expanded="false" />
             <element signature="e#30257#30258#0" expanded="true" />
             <element signature="e#30303#30304#0" expanded="true" />
-            <element signature="method#isValidBooleanComparison#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isValidBooleanOperation#0;class#Visitor#0" expanded="false" />
             <element signature="method#evaluateChildCondition#0;class#Visitor#0" expanded="false" />
             <element signature="method#evaluateArithmaticChildren#0;class#Visitor#0" expanded="false" />
           </folding>
@@ -1004,45 +995,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Visitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="287">
-          <caret line="479" column="31" lean-forward="false" selection-start-line="479" selection-start-column="31" selection-end-line="479" selection-end-column="31" />
-          <folding>
-            <element signature="method#visit#2;class#Visitor#0" expanded="false" />
-            <element signature="method#visit#3;class#Visitor#0" expanded="false" />
-            <element signature="method#visit#5;class#Visitor#0" expanded="false" />
-            <element signature="method#visit#7;class#Visitor#0" expanded="false" />
-            <element signature="method#visit#9;class#Visitor#0" expanded="false" />
-            <element signature="method#visit#10;class#Visitor#0" expanded="false" />
-            <element signature="method#visit#11;class#Visitor#0" expanded="false" />
-            <element signature="method#visit#12;class#Visitor#0" expanded="false" />
-            <element signature="e#10271#10272#0" expanded="true" />
-            <element signature="e#10312#10313#0" expanded="true" />
-            <element signature="method#visit#14;class#Visitor#0" expanded="false" />
-            <element signature="method#visit#15;class#Visitor#0" expanded="false" />
-            <element signature="method#visit#16;class#Visitor#0" expanded="false" />
-            <element signature="method#visit#17;class#Visitor#0" expanded="false" />
-            <element signature="e#20853#20854#0" expanded="true" />
-            <element signature="e#20894#20895#0" expanded="true" />
-            <element signature="e#20963#20964#0" expanded="true" />
-            <element signature="e#21004#21005#0" expanded="true" />
-            <element signature="e#21077#21078#0" expanded="true" />
-            <element signature="e#21118#21119#0" expanded="true" />
-            <element signature="e#22344#22345#0" expanded="true" />
-            <element signature="e#22385#22386#0" expanded="true" />
-            <element signature="method#updateSymbol#0;class#Visitor#0" expanded="false" />
-            <element signature="method#printErrorList#0;class#Visitor#0" expanded="false" />
-            <element signature="method#isInt#0;class#Visitor#0" expanded="false" />
-            <element signature="e#30257#30258#0" expanded="true" />
-            <element signature="e#30303#30304#0" expanded="true" />
-            <element signature="method#isValidBooleanComparison#0;class#Visitor#0" expanded="false" />
-            <element signature="method#evaluateChildCondition#0;class#Visitor#0" expanded="false" />
-            <element signature="method#evaluateArithmaticChildren#0;class#Visitor#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Symbol.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1137,9 +1089,50 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test4.ccal">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-85">
+        <state relative-caret-position="-289">
           <caret line="7" column="22" lean-forward="true" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Visitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1147">
+          <caret line="637" column="17" lean-forward="false" selection-start-line="637" selection-start-column="17" selection-end-line="637" selection-end-column="17" />
+          <folding>
+            <element signature="method#visit#2;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#3;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#5;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#7;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#9;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#10;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#11;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#12;class#Visitor#0" expanded="false" />
+            <element signature="e#10271#10272#0" expanded="true" />
+            <element signature="e#10312#10313#0" expanded="true" />
+            <element signature="method#visit#14;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#15;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#16;class#Visitor#0" expanded="false" />
+            <element signature="method#visit#17;class#Visitor#0" expanded="false" />
+            <element signature="e#20853#20854#0" expanded="true" />
+            <element signature="e#20894#20895#0" expanded="true" />
+            <element signature="e#20963#20964#0" expanded="true" />
+            <element signature="e#21004#21005#0" expanded="true" />
+            <element signature="e#21077#21078#0" expanded="true" />
+            <element signature="e#21118#21119#0" expanded="true" />
+            <element signature="e#22344#22345#0" expanded="true" />
+            <element signature="e#22385#22386#0" expanded="true" />
+            <element signature="method#visit#36;class#Visitor#0" expanded="false" />
+            <element signature="method#updateSymbol#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isSematicError#0;class#Visitor#0" expanded="false" />
+            <element signature="method#printErrorList#0;class#Visitor#0" expanded="false" />
+            <element signature="method#isInt#0;class#Visitor#0" expanded="false" />
+            <element signature="e#30257#30258#0" expanded="true" />
+            <element signature="e#30303#30304#0" expanded="true" />
+            <element signature="method#isValidBooleanOperation#0;class#Visitor#0" expanded="false" />
+            <element signature="method#evaluateChildCondition#0;class#Visitor#0" expanded="false" />
+            <element signature="method#evaluateArithmaticChildren#0;class#Visitor#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
