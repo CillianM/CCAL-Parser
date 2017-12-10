@@ -597,7 +597,10 @@ public class Representer implements CCALParserVisitor {
         ThreeAddressCode addAddressCode = new ThreeAddressCode();
         addAddressCode.setAddress1("+");
         addAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
-        if(!(node.jjtGetChild(1) instanceof ASTVariable) && !(node.jjtGetChild(1) instanceof ASTDigit && !(node.jjtGetChild(1) instanceof ASTBoolean))){
+        if(node.jjtGetChild(1)instanceof ASTMinus){
+            addAddressCode.setAddress3("-" + node.jjtGetChild(1).jjtGetChild(0).jjtAccept(this, null).toString());
+        }
+        else if(!(node.jjtGetChild(1) instanceof ASTVariable) && !(node.jjtGetChild(1) instanceof ASTDigit && !(node.jjtGetChild(1) instanceof ASTBoolean))){
             node.childrenAccept(this, data);
         }
         else {
@@ -620,7 +623,10 @@ public class Representer implements CCALParserVisitor {
         ThreeAddressCode subtractAddressCode = new ThreeAddressCode();
         subtractAddressCode.setAddress1("-");
         subtractAddressCode.setAddress2(node.jjtGetChild(0).jjtAccept(this, null).toString());
-        if(!(node.jjtGetChild(1) instanceof ASTVariable) && !(node.jjtGetChild(1) instanceof ASTDigit && !(node.jjtGetChild(1) instanceof ASTBoolean))){
+        if(node.jjtGetChild(1)instanceof ASTMinus){
+            subtractAddressCode.setAddress3("-" + node.jjtGetChild(1).jjtGetChild(0).jjtAccept(this, null).toString());
+        }
+        else if(!(node.jjtGetChild(1) instanceof ASTVariable) && !(node.jjtGetChild(1) instanceof ASTDigit && !(node.jjtGetChild(1) instanceof ASTBoolean))){
             node.childrenAccept(this, data);
         }
         else {

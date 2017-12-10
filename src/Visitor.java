@@ -723,13 +723,23 @@ public class Visitor implements CCALParserVisitor {
     }
 
     private void performArithmatic(Node parentNode, Object data) {
+        boolean isLeftNeg =false;
+        boolean isRightNeg = false;
         Token leftToken = (Token) parentNode.jjtGetChild(0).jjtAccept(this, null);
+        if(leftToken == null) {
+            leftToken = (Token) parentNode.jjtGetChild(1).jjtGetChild(0).jjtAccept(this, null);
+            isLeftNeg = !isLeftNeg;
+        }
         Node leftNode = parentNode.jjtGetChild(0);
         if (isValidArithmetic(leftNode, leftToken)) {
             evaluateArithmaticChildren(parentNode, data);
         }
 
         Token rightToken = (Token) parentNode.jjtGetChild(1).jjtAccept(this, null);
+        if(rightToken == null) {
+            rightToken = (Token) parentNode.jjtGetChild(1).jjtGetChild(0).jjtAccept(this, null);
+            isRightNeg = !isRightNeg;
+        }
         Node rightNode = parentNode.jjtGetChild(1);
         if (isValidArithmetic(rightNode, rightToken)) {
             evaluateArithmaticChildren(parentNode, data);
@@ -737,6 +747,8 @@ public class Visitor implements CCALParserVisitor {
         String type = INTEGER;
         String leftValue = leftToken.image;
         String rightValue = rightToken.image;
+        if(isLeftNeg) leftValue = "-"+ leftToken.image;
+        if(isRightNeg) rightValue = "-"+ rightToken.image;
         if(data != null){
             Symbol symbol = (Symbol) data;
             String binOP = "-";
